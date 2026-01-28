@@ -11,9 +11,9 @@ public class Jugador extends Staff{
 	private int puntos;
 	private POSICION posicion;
 	
-	public Jugador(String cod_s, String nom_s, int edad, LocalDate fechaIncor, String pais, double sueldo, int puntos,
+	public Jugador(String cod_s, String nom_s, int edad, LocalDate fechaIncor, String pais, double sueldo, String cod_e, int puntos,
 			POSICION posicion) {
-		super(cod_s, nom_s, edad, fechaIncor, pais, sueldo);
+		super(cod_s, nom_s, edad, fechaIncor, pais, sueldo, cod_e);
 		this.puntos = puntos;
 		this.posicion = posicion;
 	}

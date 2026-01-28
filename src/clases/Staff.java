@@ -14,33 +14,40 @@ public abstract class Staff implements Serializable{
 	protected LocalDate fechaIncor;
 	protected String pais;
 	protected double sueldo;
+	protected String cod_e;
 	
 	
 	
 	
-	public Staff(String cod_s, String nom_s, int edad, LocalDate fechaIncor, String pais, double sueldo) {
-		super();
+	public Staff(String cod_s, String nom_s, int edad, LocalDate fechaIncor, String pais, double sueldo, String cod_e) {
 		this.cod_s = cod_s;
 		this.nom_s = nom_s;
 		this.edad = edad;
 		this.fechaIncor = fechaIncor;
 		this.pais = pais;
 		this.sueldo = sueldo;
+		this.cod_e = cod_e;
 	}
 	
 	public Staff() {
-		super();
 		this.cod_s = "";
 		this.nom_s = "";
 		this.edad = 0;
 		this.fechaIncor = LocalDate.now();
 		this.pais = "";
 		this.sueldo = 0;
+		this.cod_e = "";
 	}
 	
 	
-	
-	
+	public String getCod_e() {
+		return cod_e;
+	}
+
+	public void setCod_e(String cod_e) {
+		this.cod_e = cod_e;
+	}
+
 	public String getCod_s() {
 		return cod_s;
 	}
