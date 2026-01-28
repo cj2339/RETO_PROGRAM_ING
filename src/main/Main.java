@@ -1,11 +1,15 @@
 package main;
 
+import java.io.File;
+
 import utilidades.Utilidades;
 
 public class Main {
 
 	public static void main(String[] args) {
 		int opc;
+		File fich1 = new File ("Staffs.dat");
+		File fich2 = new File ("Equipos.dat");
 		do {
 			opc = menu();
 			switch (opc) {
@@ -143,7 +147,7 @@ public class Main {
 		System.out.println("11. Mostrar jugadores ordenados por puntos");
 		System.out.println("12. Salir");
 		System.out.println("¿Qué quieres hacer?");
-		ele = Utilidades.leerInt(1, 5);
+		ele = Utilidades.leerInt(1, 12);
 		return ele;
 
 	}
