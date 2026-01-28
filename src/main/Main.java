@@ -53,13 +53,13 @@ public class Main {
 			case 10:
 				mostrarJugadoresPos();
 				//Se le pedira al usuario una de las posiciones. Se comprobara que la posicion este en el enum. Se mostraran los juadores de dicha posicion
-				
 				break;
 			case 11:
 				jugadoresPorPuntos();
 				//Se mostrara la lista de jugadores ordenados por los puntos.
 				break;
 			case 12:
+				System.out.println("Agurrr");
 				break;
 				
 			}
