@@ -1,22 +1,22 @@
 package clases;
 
 import java.io.FileWriter;
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Equipo {
+public class Equipo implements Serializable{
 	private String cod_e;
 	private String nom_e;
 	private LocalDate fechaFundacion;
 	private FileWriter cantico;
-	
-	
+
 	public Equipo(String cod_e, String nom_e, LocalDate fechaFundacion, FileWriter cantico) {
 		this.cod_e = cod_e;
 		this.nom_e = nom_e;
 		this.fechaFundacion = fechaFundacion;
 		this.cantico = cantico;
 	}
-	
+
 	public Equipo() {
 		this.cod_e = "";
 		this.nom_e = "";
@@ -55,8 +55,13 @@ public class Equipo {
 	public void setCantico(FileWriter cantico) {
 		this.cantico = cantico;
 	}
-	
 
+	public void mostrarInfo() {
+		System.out.println("Codigo: " + this.cod_e);
+		System.out.println("Nombre: " + this.nom_e);
+		System.out.println("Fecha de fundacion: " + this.fechaFundacion);
+		System.out.println("Cantico: " + this.cantico);
+
+	}
 	
 }
-
