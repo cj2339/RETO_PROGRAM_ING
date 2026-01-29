@@ -143,12 +143,12 @@ public class Main {
 		boolean finArchivo = false;
 		MyObjectOutputStream moos = null;
 		HashMap<String, Ejercicio> ejercicios = new HashMap<>();
-		System.out.println("Introduce el codigo del Entrenador al que quieres añadirle un entrenamiento: ");
-		cod_e = Utilidades.introducirCadena();
+		
 		if (!fich1.exists()) {
-			System.out.println("No hay equipos registrados. No se puede añadir un entrenador.");
+			System.out.println("No hay entrenadores registrados. No se puede añadir un entrenador.");
 		} else {
-			
+			System.out.println("Introduce el codigo del Entrenador al que quieres añadirle un entrenamiento: ");
+			cod_e = Utilidades.introducirCadena();
 			System.out.println("Introduce el codigo del entrenamiento: ");
 			cod_ej = Utilidades.introducirCadena();
 			System.out.println("Introduce el nombre del entrenamiento: ");
