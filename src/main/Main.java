@@ -12,10 +12,7 @@ import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.util.HashMap;
 
-import clases.Ejercicio;
-import clases.Entrenador;
-import clases.Equipo;
-import clases.Jugador;
+import clases.*;
 import utilidades.Utilidades;
 import utilidades.MyObjectOutputStream;
 
@@ -89,6 +86,7 @@ public class Main {
 			case 11:
 				jugadoresPorPuntos();
 				// Se mostrara la lista de jugadores ordenados por los puntos.
+				mostrarEntrenadores(fich1);
 				break;
 			case 12:
 				System.out.println("Agurrr");
@@ -171,11 +169,11 @@ public class Main {
 				try {
 					ois = new ObjectInputStream(new FileInputStream(fich1));
 					while (!finArchivo) {
-						Entrenador entrenador = (Entrenador) ois.readObject();
-						if (entrenador.getCod_e().equalsIgnoreCase(cod_e)) {
+						Staff staff = (Entrenador) ois.readObject();
+						if (staff.getCod_e().equalsIgnoreCase(cod_e)) {
 							encontrado = true;
 							finArchivo = true;
-							entrenador.getEjercicio().put(cod_ej, ejercicio);
+							((Entrenador) staff).getEjercicio().put(cod_ej, ejercicio);
 						}
 
 					}
@@ -205,8 +203,10 @@ public class Main {
 		try {
 			ois = new ObjectInputStream(new FileInputStream(fich1));
 			while (!finArchivo) {
-				Entrenador entrenador = (Entrenador) ois.readObject();
-				System.out.println(entrenador);
+				Staff staff = (Staff) ois.readObject();
+				if(staff instanceof Entrenador) {
+				staff.visualizar();
+				}
 			}
 		} catch (EOFException e) {
 			finArchivo = true;
