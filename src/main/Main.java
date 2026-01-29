@@ -32,7 +32,7 @@ public class Main {
 			opc = menu();
 			switch (opc) {
 				case 1:
-					aniadirJugador();
+					aniadirJugador(fich1);
 					// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
 					// seteando. Se pediran todos los datos y se guardaran al final.
 					break;
@@ -326,8 +326,81 @@ public class Main {
 		}
 	}
 
-	private static void aniadirJugador() {
-
+	private static void aniadirJugador(File fich1) {
+		String nombre_s, pais, cod_e, tipo, cod_j="JUG - ", cod_ju;
+		int edad, puntos, cont=0;
+		double sueldo;
+		LocalDate fechaIncor;
+		ObjectOutputStream oos;
+		MyObjectOutputStream moos;
+		boolean finArchivo = false;
+		ObjectInputStream ois = null;
+		POSICION posicion = null;// Hubo un importe aqui
+		boolean correcto=true;		
+		System.out.println("Introduce el nombre del Staff: ");
+		nombre_s=Utilidades.introducirCadena();
+		System.out.println("Introduce la edad: ");
+		edad=Utilidades.leerInt();
+		System.out.println("Introduce la fecha de incorporación:(A/M/D) ");
+		fechaIncor=Utilidades.leerFechaAMD();
+		System.out.println("Introduce el pais: ");
+		pais=Utilidades.introducirCadena();
+		System.out.println("Introduce el sueldo: ");
+		sueldo=Utilidades.leerDouble();
+		System.out.println("Introduce el codigo del entrenamiento: ");
+		cod_e=Utilidades.introducirCadena();
+		System.out.println("Introduce los puntos del jugador: ");
+		puntos=Utilidades.leerInt();
+		do {
+			System.out.println("Introduce la posicion del jugador: (BASE, ALERO, PIVOT)");
+			tipo=Utilidades.introducirCadena();
+			try {
+				posicion = POSICION.valueOf(tipo);
+				correcto=true;
+			} catch (IllegalArgumentException e) {
+				System.err.println("El valor '" + tipo + "' no es una posicion válida.");
+				correcto=false;
+			}
+		}while(!correcto);
+		
+		if (fich1.exists()) {
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich1));
+				while (!finArchivo) {
+					ois.readObject();
+					cont++;
+				}
+			} catch (EOFException e) {
+				finArchivo = true;
+			} catch (Exception e) {
+				System.err.println("Error al contar registros: " + e.getMessage());
+			}
+		}
+		
+		cod_ju=cod_j+(cont+1);
+		System.out.println("El codigo del jugador es "+cod_ju);
+		Jugador j=new Jugador(cod_ju, nombre_s,  edad,  fechaIncor,  pais,  sueldo,  cod_e,  puntos, posicion);// hubo un importe aqui
+		if(!fich1.exists()) {
+			try {
+				oos = new ObjectOutputStream(new FileOutputStream(fich1));
+				oos.writeObject(j);
+				oos.close();
+			} catch (FileNotFoundException e) {
+				System.out.println("No se encontró el fichero");
+			} catch (IOException e) {
+				System.out.println("Error leyendo el fichero");
+			}
+		}else {
+			try {
+			moos = new MyObjectOutputStream(new FileOutputStream(fich1));
+			moos.writeObject(j);
+			moos.close();
+			} catch (FileNotFoundException e) {
+				System.out.println("No se encontró el fichero");
+			} catch (IOException e) {
+				System.out.println("Error leyendo el fichero");
+			}
+		}
 	}
 
 	private static String existeJugador() {
