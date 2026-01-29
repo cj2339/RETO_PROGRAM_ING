@@ -42,7 +42,7 @@ public class Main {
 					// seteando. Se pediran todos los datos y se guardaran al final.
 					break;
 				case 3:
-					aniadirEntrenamiento();
+					aniadirEntrenamiento(fich1);
 					// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
 					// añada, advertiremos de que el formato del codigo deberan de ser minimo
 					// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
@@ -133,9 +133,85 @@ public class Main {
 
 	}
 
-	private static void aniadirEntrenamiento() {
-		// TODO Auto-generated method stub
+	private static void aniadirEntrenamiento(File fich1) {
+		boolean encontrado = false;
+		String cod_e, cod_ej, nom, descripcion;
+		int duracion, dificultad;
+		LocalDate fecha;
+		ObjectOutputStream oos = null;
+		ObjectInputStream ois = null;
+		boolean finArchivo = false;
+		MyObjectOutputStream moos = null;
+		HashMap<String, Ejercicio> ejercicios = new HashMap<>();
+		System.out.println("Introduce el codigo del Entrenador al que quieres añadirle un entrenamiento: ");
+		cod_e = Utilidades.introducirCadena();
+		if (!fich1.exists()) {
+			System.out.println("No hay equipos registrados. No se puede añadir un entrenador.");
+		} else {
+			
+			System.out.println("Introduce el codigo del entrenamiento: ");
+			cod_ej = Utilidades.introducirCadena();
+			System.out.println("Introduce el nombre del entrenamiento: ");
+			nom = Utilidades.introducirCadena();
+			System.out.println("Introduce la dificultad del ejercicio: ");
+			dificultad = Utilidades.leerInt(1, 5);
+			System.out.println("Introduce la descripcion del entrenamiento: ");
+			descripcion = Utilidades.introducirCadena();
+			Ejercicio ejercicio = new Ejercicio(cod_ej, nom, descripcion, dificultad);
+			
 
+			do {
+				System.out.println("Entrenadores disponibles:");
+				mostrarEntrenadores(fich1);
+
+				System.out.println("Introduce el codigo del entrenador: ");
+				cod_e = Utilidades.introducirCadena();
+
+				try {
+					ois = new ObjectInputStream(new FileInputStream(fich1));
+					while (!finArchivo) {
+						Entrenador entrenador = (Entrenador) ois.readObject();
+						if (entrenador.getCod_e().equalsIgnoreCase(cod_e)) {
+							encontrado = true;
+							finArchivo = true;
+							entrenador.getEjercicio().put(cod_ej, ejercicio);
+						}
+
+					}
+				} catch (EOFException e) {
+					finArchivo = true;
+				} catch (IOException | ClassNotFoundException e) {
+					System.err.println("Error al leer equipos: " + e.getMessage());
+				}
+
+				if (!encontrado) {
+					System.out.println("El equipo no existe. Reintente.");
+				}
+				finArchivo = false;
+			} while (!encontrado);
+
+			
+			
+			
+			
+		}
+
+	}
+
+	private static void mostrarEntrenadores(File fich1) {
+		ObjectInputStream ois = null;
+		boolean finArchivo = false;
+		try {
+			ois = new ObjectInputStream(new FileInputStream(fich1));
+			while (!finArchivo) {
+				Entrenador entrenador = (Entrenador) ois.readObject();
+				System.out.println(entrenador);
+			}
+		} catch (EOFException e) {
+			finArchivo = true;
+		} catch (IOException | ClassNotFoundException e) {
+			System.err.println("Error al leer equipos: " + e.getMessage());
+		}
 	}
 
 	private static void editarEdad() {
@@ -194,7 +270,7 @@ public class Main {
 				if (!encontrado) {
 					System.out.println("El equipo no existe. Reintente.");
 				}
-				finArchivo=false;
+				finArchivo = false;
 			} while (!encontrado);
 
 			System.out.println("Introduce la jugada base: ");
