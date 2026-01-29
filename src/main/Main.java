@@ -100,37 +100,31 @@ public class Main {
 	}
 
 	private static void jugadoresPorPuntos() {
-		// TODO Auto-generated method stub
+	
 
 	}
 
 	private static void mostrarJugadoresPos() {
-		// TODO Auto-generated method stub
 
 	}
 
 	private static void traspasoJugador() {
-		// TODO Auto-generated method stub
 
 	}
 
 	private static void mostrarMasAntiguo() {
-		// TODO Auto-generated method stub
 
 	}
 
 	private static void clasificacion() {
-		// TODO Auto-generated method stub
 
 	}
 
 	private static void infoEquipo() {
-		// TODO Auto-generated method stub
 
 	}
 
 	private static void eliminarJugador() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -215,7 +209,7 @@ public class Main {
 	}
 
 	private static void editarEdad() {
-		// TODO Auto-generated method stub
+		
 
 	}
 
