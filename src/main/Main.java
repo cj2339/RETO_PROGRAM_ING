@@ -24,73 +24,75 @@ public class Main {
 		File fich2 = new File("Equipos.dat");
 		if (!fich2.exists()) {
 			fillData(fich2);
+			saveDataJugadores(fich1);
+
 		}
 
 		do {
 			opc = menu();
 			switch (opc) {
-			case 1:
-				aniadirJugador();
-				// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
-				// seteando. Se pediran todos los datos y se guardaran al final.
-				break;
-			case 2:
-				aniadirEntrenador(fich1, fich2);
-				// El codigo se autogenerara (Ejemplo: ENT - 001) los demas datos NO se iran
-				// seteando. Se pediran todos los datos y se guardaran al final.
-				break;
-			case 3:
-				aniadirEntrenamiento(fich1);
-				// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
-				// añada, advertiremos de que el formato del codigo deberan de ser minimo
-				// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
-				// los datos y se guardaran al final.
-				break;
-			case 4:
-				editarEdad();
-				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-				// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
-				// Se comprobara que el codigo que ha introducido existe.
-				break;
-			case 5:
-				eliminarJugador();
-				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-				// codigos. Se comprobara que el jugador exista para poder eliminarlo.
-				break;
-			case 6:
-				infoEquipo();
-				// Se mostrara la info de un equipo.
-				break;
-			case 7:
-				clasificacion();
-				// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
-				// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
-				// un equipo.
-				break;
-			case 8:
-				mostrarMasAntiguo();
-				// muestra el jugador que mas años haya estado en un equipo.
-				break;
+				case 1:
+					aniadirJugador();
+					// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
+					// seteando. Se pediran todos los datos y se guardaran al final.
+					break;
+				case 2:
+					aniadirEntrenador(fich1, fich2);
+					// El codigo se autogenerara (Ejemplo: ENT - 001) los demas datos NO se iran
+					// seteando. Se pediran todos los datos y se guardaran al final.
+					break;
+				case 3:
+					aniadirEntrenamiento(fich1);
+					// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
+					// añada, advertiremos de que el formato del codigo deberan de ser minimo
+					// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
+					// los datos y se guardaran al final.
+					break;
+				case 4:
+					editarEdad();
+					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+					// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
+					// Se comprobara que el codigo que ha introducido existe.
+					break;
+				case 5:
+					eliminarJugador();
+					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+					// codigos. Se comprobara que el jugador exista para poder eliminarlo.
+					break;
+				case 6:
+					infoEquipo();
+					// Se mostrara la info de un equipo.
+					break;
+				case 7:
+					clasificacion();
+					// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
+					// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
+					// un equipo.
+					break;
+				case 8:
+					mostrarMasAntiguo();
+					// muestra el jugador que mas años haya estado en un equipo.
+					break;
 				// Opcionales si nos vemos bn de tiempo.
-			case 9:
-				traspasoJugador();
-				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-				// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
-				// guardara la info para que se traspase.
-				break;
-			case 10:
-				mostrarJugadoresPos();
-				// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
-				// este en el enum. Se mostraran los juadores de dicha posicion
-				break;
-			case 11:
-				jugadoresPorPuntos();
-				// Se mostrara la lista de jugadores ordenados por los puntos.
-				mostrarEntrenadores(fich1);
-				break;
-			case 12:
-				System.out.println("Agurrr");
-				break;
+				case 9:
+					traspasoJugador();
+					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+					// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
+					// guardara la info para que se traspase.
+					break;
+				case 10:
+					mostrarJugadoresPos();
+					// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
+					// este en el enum. Se mostraran los juadores de dicha posicion
+					break;
+				case 11:
+					jugadoresPorPuntos();
+					// Se mostrara la lista de jugadores ordenados por los puntos.
+					mostrarEntrenadores(fich1);
+					break;
+				case 12:
+					System.out.println("Agurrr");
+					break;
 
 			}
 
@@ -158,7 +160,6 @@ public class Main {
 			descripcion = Utilidades.introducirCadena();
 			Ejercicio ejercicio = new Ejercicio(cod_ej, nom, descripcion, dificultad);
 
-
 			do {
 				System.out.println("Entrenadores disponibles:");
 				mostrarEntrenadores(fich1);
@@ -177,6 +178,7 @@ public class Main {
 						}
 
 					}
+					ois.close();
 				} catch (EOFException e) {
 					finArchivo = true;
 				} catch (IOException | ClassNotFoundException e) {
@@ -189,10 +191,6 @@ public class Main {
 				finArchivo = false;
 			} while (!encontrado);
 
-
-
-
-
 		}
 
 	}
@@ -204,10 +202,11 @@ public class Main {
 			ois = new ObjectInputStream(new FileInputStream(fich1));
 			while (!finArchivo) {
 				Staff staff = (Staff) ois.readObject();
-				if(staff instanceof Entrenador) {
-				staff.visualizar();
+				if (staff instanceof Entrenador) {
+					staff.visualizar();
 				}
 			}
+			ois.close();
 		} catch (EOFException e) {
 			finArchivo = true;
 		} catch (IOException | ClassNotFoundException e) {
@@ -262,6 +261,7 @@ public class Main {
 						}
 
 					}
+					ois.close();
 				} catch (EOFException e) {
 					finArchivo = true;
 				} catch (IOException | ClassNotFoundException e) {
@@ -284,6 +284,7 @@ public class Main {
 						ois.readObject();
 						cont++;
 					}
+					ois.close();
 				} catch (EOFException e) {
 					finArchivo = true;
 				} catch (Exception e) {
@@ -340,14 +341,14 @@ public class Main {
 
 		// Si el usuario escribe algo como "salir" o vacío, devolvemos -1
 		if (codJugador.isEmpty() || codJugador.equalsIgnoreCase("salir")) {
-			return "-1";//esto tengo que cambiarlo
+			return "-1";// esto tengo que cambiarlo
 		}
 
 		File fichJugadores = new File("Jugadores.dat");
 
 		if (!fichJugadores.exists() || fichJugadores.length() == 0) {
 			System.out.println("No hay jugadores registrados todavía.");
-			return "-1";//y esto también 
+			return "-1";// y esto también
 		}
 
 		try {
@@ -357,7 +358,7 @@ public class Main {
 			while (!finArchivo) {
 				try {
 					Jugador j = (Jugador) ois.readObject();
-					if (j.getCod_e().equalsIgnoreCase(codJugador) && encontrado==true) {
+					if (j.getCod_e().equalsIgnoreCase(codJugador) && encontrado == true) {
 						encontrado = true;
 					}
 				} catch (EOFException e) {
@@ -461,6 +462,56 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static void saveDataJugadores(File fich1) {
+		int i = 1; // Contador para el autoincremento del código "JUG - X"
+
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fich1))) {
+
+			// --- Equipo: MOR - 1 ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Juan Pérez", 25, LocalDate.of(2020, 5, 10), "España", 2500,
+					"MOR - 1", 150, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Luka Modric", 28, LocalDate.of(2019, 8, 15), "Croacia", 3000,
+					"MOR - 1", 200, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Marc Gasol", 32, LocalDate.of(2021, 1, 20), "España", 4500,
+					"MOR - 1", 300, POSICION.PIVOT));
+			oos.writeObject(new Jugador("JUG - " + i++, "Ricky Rubio", 24, LocalDate.of(2022, 3, 12), "España", 2200,
+					"MOR - 1", 120, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Kevin Durant", 30, LocalDate.of(2018, 11, 5), "USA", 5000,
+					"MOR - 1", 450, POSICION.ALERO));
+
+			// --- Equipo: REA - 1 ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Carlos Alocén", 22, LocalDate.of(2023, 6, 1), "España", 1800,
+					"REA - 1", 80, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Sergio Llull", 34, LocalDate.of(2010, 9, 10), "España", 4000,
+					"REA - 1", 500, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Walter Tavares", 31, LocalDate.of(2017, 10, 15), "Cabo Verde",
+					4800, "REA - 1", 600, POSICION.PIVOT));
+			oos.writeObject(new Jugador("JUG - " + i++, "Rudy Fernández", 36, LocalDate.of(2012, 7, 22), "España", 3500,
+					"REA - 1", 350, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Mario Hezonja", 27, LocalDate.of(2022, 8, 30), "Croacia", 2900,
+					"REA - 1", 210, POSICION.ALERO));
+
+			// --- Equipo: BAR - 1 ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Nico Laprovittola", 33, LocalDate.of(2021, 7, 1), "Argentina",
+					2700, "BAR - 1", 190, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Álex Abrines", 29, LocalDate.of(2019, 9, 12), "España", 2600,
+					"BAR - 1", 175, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Willy Hernangómez", 29, LocalDate.of(2023, 7, 15), "España",
+					4200, "BAR - 1", 310, POSICION.PIVOT));
+			oos.writeObject(new Jugador("JUG - " + i++, "Jabari Parker", 28, LocalDate.of(2023, 8, 5), "USA", 3800,
+					"BAR - 1", 240, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Tomas Satoransky", 31, LocalDate.of(2022, 6, 20), "Rep. Checa",
+					3100, "BAR - 1", 160, POSICION.BASE));
+
+			System.out.println("Escritura directa finalizada: 15 jugadores guardados en Staffs.dat");
+			oos.close();
+
+		} catch (IOException e) {
+			System.err.println("Error durante la escritura: " + e.getMessage());
+		}
+
 	}
 
 }
