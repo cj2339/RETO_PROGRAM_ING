@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import clases.*;
@@ -31,68 +32,68 @@ public class Main {
 		do {
 			opc = menu();
 			switch (opc) {
-				case 1:
-					aniadirJugador(fich1);
-					// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
-					// seteando. Se pediran todos los datos y se guardaran al final.
-					break;
-				case 2:
-					aniadirEntrenador(fich1, fich2);
-					// El codigo se autogenerara (Ejemplo: ENT - 001) los demas datos NO se iran
-					// seteando. Se pediran todos los datos y se guardaran al final.
-					break;
-				case 3:
-					aniadirEntrenamiento(fich1);
-					// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
-					// añada, advertiremos de que el formato del codigo deberan de ser minimo
-					// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
-					// los datos y se guardaran al final.
-					break;
-				case 4:
-					editarEdad();
-					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-					// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
-					// Se comprobara que el codigo que ha introducido existe.
-					break;
-				case 5:
-					eliminarJugador();
-					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-					// codigos. Se comprobara que el jugador exista para poder eliminarlo.
-					break;
-				case 6:
-					infoEquipo();
-					// Se mostrara la info de un equipo.
-					break;
-				case 7:
-					clasificacion();
-					// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
-					// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
-					// un equipo.
-					break;
-				case 8:
-					mostrarMasAntiguo();
-					// muestra el jugador que mas años haya estado en un equipo.
-					break;
+			case 1:
+				aniadirJugador(fich1);
+				// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
+				// seteando. Se pediran todos los datos y se guardaran al final.
+				break;
+			case 2:
+				aniadirEntrenador(fich1, fich2);
+				// El codigo se autogenerara (Ejemplo: ENT - 001) los demas datos NO se iran
+				// seteando. Se pediran todos los datos y se guardaran al final.
+				break;
+			case 3:
+				aniadirEntrenamiento(fich1);
+				// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
+				// añada, advertiremos de que el formato del codigo deberan de ser minimo
+				// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
+				// los datos y se guardaran al final.
+				break;
+			case 4:
+				editarEdad();
+				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+				// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
+				// Se comprobara que el codigo que ha introducido existe.
+				break;
+			case 5:
+				eliminarJugador();
+				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+				// codigos. Se comprobara que el jugador exista para poder eliminarlo.
+				break;
+			case 6:
+				infoEquipo();
+				// Se mostrara la info de un equipo.
+				break;
+			case 7:
+				clasificacion();
+				// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
+				// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
+				// un equipo.
+				break;
+			case 8:
+				mostrarMasAntiguo();
+				// muestra el jugador que mas años haya estado en un equipo.
+				break;
 				// Opcionales si nos vemos bn de tiempo.
-				case 9:
-					traspasoJugador();
-					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-					// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
-					// guardara la info para que se traspase.
-					break;
-				case 10:
-					mostrarJugadoresPos();
-					// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
-					// este en el enum. Se mostraran los juadores de dicha posicion
-					break;
-				case 11:
-					jugadoresPorPuntos();
-					// Se mostrara la lista de jugadores ordenados por los puntos.
-					mostrarEntrenadores(fich1);
-					break;
-				case 12:
-					System.out.println("Agurrr");
-					break;
+			case 9:
+				traspasoJugador();
+				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+				// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
+				// guardara la info para que se traspase.
+				break;
+			case 10:
+				mostrarJugadoresPos();
+				// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
+				// este en el enum. Se mostraran los juadores de dicha posicion
+				break;
+			case 11:
+				jugadoresPorPuntos();
+				// Se mostrara la lista de jugadores ordenados por los puntos.
+				mostrarEntrenadores(fich1);
+				break;
+			case 12:
+				System.out.println("Agurrr");
+				break;
 
 			}
 
@@ -100,7 +101,7 @@ public class Main {
 	}
 
 	private static void jugadoresPorPuntos() {
-	
+
 
 	}
 
@@ -132,61 +133,60 @@ public class Main {
 		boolean encontrado = false;
 		String cod_e, cod_ej, nom, descripcion;
 		int duracion, dificultad;
-		LocalDate fecha;
-		ObjectOutputStream oos = null;
 		ObjectInputStream ois = null;
 		boolean finArchivo = false;
-		MyObjectOutputStream moos = null;
-		HashMap<String, Ejercicio> ejercicios = new HashMap<>();
 
 		if (!fich1.exists()) {
-			System.out.println("No hay entrenadores registrados. No se puede añadir un entrenador.");
+			System.out.println("No hay personal registrado. No se puede añadir un entrenamiento.");
 		} else {
-			System.out.println("Introduce el codigo del Entrenador al que quieres añadirle un entrenamiento: ");
-			cod_e = Utilidades.introducirCadena();
 			System.out.println("Introduce el codigo del entrenamiento: ");
 			cod_ej = Utilidades.introducirCadena();
 			System.out.println("Introduce el nombre del entrenamiento: ");
 			nom = Utilidades.introducirCadena();
-			System.out.println("Introduce la dificultad del ejercicio: ");
+
+			System.out.println("Introduce la duración del entrenamiento (minutos): ");
+			duracion = Utilidades.leerInt(); 
+
+			System.out.println("Introduce la dificultad del ejercicio (1-5): ");
 			dificultad = Utilidades.leerInt(1, 5);
 			System.out.println("Introduce la descripcion del entrenamiento: ");
 			descripcion = Utilidades.introducirCadena();
-			Ejercicio ejercicio = new Ejercicio(cod_ej, nom, descripcion, dificultad);
+
+			Ejercicio ejercicio = new Ejercicio(cod_ej, nom, descripcion, dificultad, duracion);
 
 			do {
 				System.out.println("Entrenadores disponibles:");
 				mostrarEntrenadores(fich1);
-
-				System.out.println("Introduce el codigo del entrenador: ");
+				System.out.println("Introduce el codigo del Entrenador al que quieres añadirle el entrenamiento: ");
 				cod_e = Utilidades.introducirCadena();
-
+				finArchivo = false;
 				try {
 					ois = new ObjectInputStream(new FileInputStream(fich1));
-					while (!finArchivo) {
-						Staff staff = (Entrenador) ois.readObject();
-						if (staff.getCod_e().equalsIgnoreCase(cod_e)) {
-							encontrado = true;
+					while (!finArchivo && !encontrado) {
+						try {
+							Object obj = ois.readObject();
+							if (obj instanceof Entrenador) {
+								Entrenador ent = (Entrenador) obj;
+								if (ent.getCod_e().equalsIgnoreCase(cod_e)) {
+									encontrado = true;
+									ent.getEjercicio().put(cod_ej, ejercicio);
+									System.out.println("Entrenamiento añadido con éxito.");
+								}
+							}
+						} catch (EOFException e) {
 							finArchivo = true;
-							((Entrenador) staff).getEjercicio().put(cod_ej, ejercicio);
 						}
-
 					}
 					ois.close();
-				} catch (EOFException e) {
-					finArchivo = true;
 				} catch (IOException | ClassNotFoundException e) {
-					System.err.println("Error al leer equipos: " + e.getMessage());
+					System.err.println("Error al procesar el archivo: " + e.getMessage());
+					break;
 				}
-
 				if (!encontrado) {
-					System.out.println("El equipo no existe. Reintente.");
+					System.out.println("El código de entrenador no existe. Reintente.");
 				}
-				finArchivo = false;
 			} while (!encontrado);
-
 		}
-
 	}
 
 	private static void mostrarEntrenadores(File fich1) {
@@ -209,8 +209,58 @@ public class Main {
 	}
 
 	private static void editarEdad() {
-		
+		String codigo = existeJugador();
+		boolean operacionExitosa = false;
+		String mensaje = "Operación cancelada o jugador no encontrado.";
 
+		if (!codigo.equals("-1")) {
+			// Pedimos la nueva edad
+			System.out.println("Jugador encontrado: " + codigo);
+			System.out.print("Introduce la nueva edad: ");
+			int nuevaEdad = Utilidades.leerInt(16, 45);
+			File fichJugadores = new File("Jugadores.dat");
+
+			if (fichJugadores.exists() && fichJugadores.length() > 0) {
+				// Lista temporal para guardar todos los jugadores
+				ArrayList<Jugador> jugadores = new ArrayList<>();
+				boolean encontrado = false;
+				try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichJugadores))) {
+					boolean finArchivo = false;
+					while (!finArchivo) {
+						try {
+							Jugador jugador = (Jugador) ois.readObject();
+							if (jugador.getCod_e().equalsIgnoreCase(codigo)) {
+								jugador.setEdad(nuevaEdad);
+								encontrado = true;
+								mensaje = "Edad actualizada correctamente a " + nuevaEdad + " años.";
+							}
+							jugadores.add(jugador);
+						} catch (EOFException e) {
+							finArchivo = true;
+						}
+					}
+					if (encontrado) {
+						// Reescribimos el fichero
+						try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fichJugadores))) {
+							for (Jugador j : jugadores) {
+								oos.writeObject(j);
+							}
+							operacionExitosa = true;
+							mensaje = "Cambios guardados correctamente en el fichero.\n" + mensaje;
+						} catch (IOException e) {
+							mensaje = "Error al guardar los cambios: " + e.getMessage();
+						}
+					} else {
+						mensaje = "Error inesperado: el jugador ya no se encuentra en el fichero.";
+					}
+				} catch (IOException | ClassNotFoundException e) {
+					mensaje = "Error al leer el fichero de jugadores: " + e.getMessage();
+				}
+			} else {
+				mensaje = "No hay jugadores registrados.";
+			}
+		}
+		System.out.println(mensaje);
 	}
 
 	private static void aniadirEntrenador(File fich1, File fich2) {
@@ -356,7 +406,7 @@ public class Main {
 				correcto=false;
 			}
 		}while(!correcto);
-		
+
 		if (fich1.exists()) {
 			try {
 				ois = new ObjectInputStream(new FileInputStream(fich1));
@@ -370,7 +420,7 @@ public class Main {
 				System.err.println("Error al contar registros: " + e.getMessage());
 			}
 		}
-		
+
 		cod_ju=cod_j+(cont+1);
 		System.out.println("El codigo del jugador es "+cod_ju);
 		Jugador j=new Jugador(cod_ju, nombre_s,  edad,  fechaIncor,  pais,  sueldo,  cod_e,  puntos, posicion);// hubo un importe aqui
@@ -386,9 +436,9 @@ public class Main {
 			}
 		}else {
 			try {
-			moos = new MyObjectOutputStream(new FileOutputStream(fich1));
-			moos.writeObject(j);
-			moos.close();
+				moos = new MyObjectOutputStream(new FileOutputStream(fich1));
+				moos.writeObject(j);
+				moos.close();
 			} catch (FileNotFoundException e) {
 				System.out.println("No se encontró el fichero");
 			} catch (IOException e) {
@@ -399,60 +449,55 @@ public class Main {
 
 	private static String existeJugador() {
 		String codJugador;
+		String res = "-1"; // Variable para guardar el resultado final
 		boolean encontrado = false;
+		boolean finArchivo = false;
 		ObjectInputStream ois = null;
+		File fichJugadores = new File("Staffs.dat");
 
-		// Pedimos el código al usuario
 		System.out.println("Introduce el código del jugador (ej: JUG - 001):");
 		codJugador = Utilidades.introducirCadena().trim();
 
-		// Si el usuario escribe algo como "salir" o vacío, devolvemos -1
-		if (codJugador.isEmpty() || codJugador.equalsIgnoreCase("salir")) {
-			return "-1";// esto tengo que cambiarlo
-		}
-
-		File fichJugadores = new File("Jugadores.dat");
-
-		if (!fichJugadores.exists() || fichJugadores.length() == 0) {
-			System.out.println("No hay jugadores registrados todavía.");
-			return "-1";// y esto también
-		}
-
-		try {
-			ois = new ObjectInputStream(new FileInputStream(fichJugadores));
-			boolean finArchivo = false;
-
-			while (!finArchivo) {
+		// Sólo entramos a buscar si el código no es vacío o "salir"
+		if (!codJugador.isEmpty() && !codJugador.equalsIgnoreCase("salir")) {
+			if (fichJugadores.exists() && fichJugadores.length() > 0) {
 				try {
-					Jugador j = (Jugador) ois.readObject();
-					if (j.getCod_e().equalsIgnoreCase(codJugador) && encontrado == true) {
-						encontrado = true;
+					ois = new ObjectInputStream(new FileInputStream(fichJugadores));
+					while (!finArchivo && !encontrado) {
+						try {
+							Object obj = ois.readObject();
+							if (obj instanceof Jugador) {
+								Jugador j = (Jugador) obj;
+								// Comparamos el código del jugador
+								if (j.getCod_e().equalsIgnoreCase(codJugador)) {
+									encontrado = true;
+									res = codJugador; // Si lo encontramos, actualizamos res
+								}
+							}
+						} catch (EOFException e) {
+							finArchivo = true;
+						}
 					}
-				} catch (EOFException e) {
-					finArchivo = true;
+				} catch (Exception e) {
+					System.err.println("Error al leer el fichero: " + e.getMessage());
+				} finally {
+					if (ois != null) {
+						try {
+							ois.close();
+						} catch (IOException e) {}
+					}
 				}
-			}
-
-		} catch (FileNotFoundException e) {
-			System.out.println("Fichero de jugadores no encontrado.");
-		} catch (IOException | ClassNotFoundException e) {
-			System.err.println("Error al leer el fichero de jugadores: " + e.getMessage());
-		} finally {
-			if (ois != null) {
-				try {
-					ois.close();
-				} catch (IOException e) {
-				}
+			} else {
+				System.out.println("No hay jugadores registrados todavía.");
 			}
 		}
-
-		if (encontrado) {
-			return codJugador;
-		} else {
+		// Si al final no se encontró, devolvemos -1
+		if (!encontrado && !res.equals("-1")) {
 			System.out.println("El jugador con código " + codJugador + " no existe.");
-			return "-1";
 		}
+		return res; 
 	}
+
 
 	public static int menu() {
 		int ele;
@@ -471,7 +516,6 @@ public class Main {
 		System.out.println("¿Qué quieres hacer?");
 		ele = Utilidades.leerInt(1, 12);
 		return ele;
-
 	}
 
 	private static void fillData(File fich2) {
