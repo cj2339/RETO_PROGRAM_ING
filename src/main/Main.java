@@ -52,7 +52,7 @@ public class Main {
 					// los datos y se guardaran al final.
 					break;
 				case 4:
-					editarEdad();
+					editarEdad(fich1);
 					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
 					// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
 					// Se comprobara que el codigo que ha introducido existe.
@@ -74,6 +74,7 @@ public class Main {
 					break;
 				case 8:
 					mostrarMasAntiguo();
+					mostrarStaffs(fich1);
 					// muestra el jugador que mas años haya estado en un equipo.
 					break;
 				// Opcionales si nos vemos bn de tiempo.
@@ -212,8 +213,8 @@ public class Main {
 		}
 	}
 
-	private static void editarEdad() {
-		String codigo = existeJugador();
+	private static void editarEdad(File fich1) {
+		String codigo = existeJugador(fich1);
 		boolean operacionExitosa = false;
 		String mensaje = "Operación cancelada o jugador no encontrado.";
 
@@ -222,31 +223,30 @@ public class Main {
 			System.out.println("Jugador encontrado: " + codigo);
 			System.out.print("Introduce la nueva edad: ");
 			int nuevaEdad = Utilidades.leerInt(16, 45);
-			File fichJugadores = new File("Jugadores.dat");
 
-			if (fichJugadores.exists() && fichJugadores.length() > 0) {
+			if (fich1.exists() && fich1.length() > 0) {
 				// Lista temporal para guardar todos los jugadores
-				ArrayList<Jugador> jugadores = new ArrayList<>();
+				ArrayList<Staff> jugadores = new ArrayList<>();
 				boolean encontrado = false;
-				try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichJugadores))) {
+				try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fich1))) {
 					boolean finArchivo = false;
 					while (!finArchivo) {
 						try {
-							Jugador jugador = (Jugador) ois.readObject();
-							if (jugador.getCod_e().equalsIgnoreCase(codigo)) {
-								jugador.setEdad(nuevaEdad);
+							Staff sf = (Staff) ois.readObject();
+							if (sf.getCod_e().equalsIgnoreCase(codigo) && sf instanceof Jugador) {
+								sf.setEdad(nuevaEdad);
 								encontrado = true;
 								mensaje = "Edad actualizada correctamente a " + nuevaEdad + " años.";
 							}
-							jugadores.add(jugador);
+							jugadores.add((Staff) sf);
 						} catch (EOFException e) {
 							finArchivo = true;
 						}
 					}
 					if (encontrado) {
 						// Reescribimos el fichero
-						try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fichJugadores))) {
-							for (Jugador j : jugadores) {
+						try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fich1))) {
+							for (Staff j : jugadores) {
 								oos.writeObject(j);
 							}
 							operacionExitosa = true;
@@ -309,7 +309,7 @@ public class Main {
 							Equipo equipo = (Equipo) ois.readObject();
 							if (equipo.getCod_e().equalsIgnoreCase(cod_e)) {
 								encontrado = true;
-								finArchivo = true; // Salimos del bucle
+								finArchivo = true;
 							}
 						} catch (EOFException e) {
 							finArchivo = true;
@@ -370,7 +370,6 @@ public class Main {
 
 			System.out.println("Introduce la jugada base: ");
 			jug_base = Utilidades.introducirCadena();
-
 			finArchivo = false;
 			if (fich1.exists()) {
 				try {
@@ -553,29 +552,28 @@ public class Main {
 		}
 	}
 
-	private static String existeJugador() {
+	private static String existeJugador(File fich1) {
 		String codJugador;
 		String res = "-1"; // Variable para guardar el resultado final
 		boolean encontrado = false;
 		boolean finArchivo = false;
 		ObjectInputStream ois = null;
-		File fichJugadores = new File("Staffs.dat");
 
 		System.out.println("Introduce el código del jugador (ej: JUG - 001):");
-		codJugador = Utilidades.introducirCadena().trim();
+		codJugador = Utilidades.introducirCadena();
 
 		// Sólo entramos a buscar si el código no es vacío o "salir"
 		if (!codJugador.isEmpty() && !codJugador.equalsIgnoreCase("salir")) {
-			if (fichJugadores.exists() && fichJugadores.length() > 0) {
+			if (fich1.exists() && fich1.length() > 0) {
 				try {
-					ois = new ObjectInputStream(new FileInputStream(fichJugadores));
+					ois = new ObjectInputStream(new FileInputStream(fich1));
 					while (!finArchivo && !encontrado) {
 						try {
-							Object obj = ois.readObject();
-							if (obj instanceof Jugador) {
-								Jugador j = (Jugador) obj;
+							Staff sf = (Staff) ois.readObject();
+							if (sf instanceof Jugador) {
+								Jugador j = (Jugador) sf;
 								// Comparamos el código del jugador
-								if (j.getCod_e().equalsIgnoreCase(codJugador)) {
+								if (j.getCod_s().equalsIgnoreCase(codJugador)) {
 									encontrado = true;
 									res = codJugador; // Si lo encontramos, actualizamos res
 								}
@@ -729,6 +727,24 @@ public class Main {
 			System.err.println("Error durante la escritura: " + e.getMessage());
 		}
 
+	}
+
+	public static void mostrarStaffs(File fich1) {
+		ObjectInputStream ois = null;
+		boolean finArchivo = false;
+		try {
+			ois = new ObjectInputStream(new FileInputStream(fich1));
+			while (!finArchivo) {
+				Jugador jugador = (Jugador) ois.readObject();
+				jugador.visualizar();
+			}
+			
+			ois.close();
+		} catch (EOFException e) {
+			finArchivo = true;
+		} catch (IOException | ClassNotFoundException e) {
+			System.err.println("Error al leer equipos: " + e.getMessage());
+		}
 	}
 
 }
