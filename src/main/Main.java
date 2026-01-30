@@ -206,7 +206,7 @@ public class Main {
 		} catch (IOException | ClassNotFoundException e) {
 			System.err.println("Error al leer equipos: " + e.getMessage());
 		}
-	}
+	} 
 
 	private static void editarEdad() {
 		String codigo = existeJugador();
