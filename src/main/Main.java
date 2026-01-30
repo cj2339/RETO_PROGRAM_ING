@@ -134,7 +134,7 @@ public class Main {
 		String cod_e, cod_ej, nom, descripcion;
 		int duracion, dificultad;
 		ObjectInputStream ois = null;
-		boolean finArchivo = false;
+		boolean finArchivo = false, error=false;
 
 		if (!fich1.exists()) {
 			System.out.println("No hay personal registrado. No se puede añadir un entrenamiento.");
@@ -160,6 +160,7 @@ public class Main {
 				System.out.println("Introduce el codigo del Entrenador al que quieres añadirle el entrenamiento: ");
 				cod_e = Utilidades.introducirCadena();
 				finArchivo = false;
+				while(!error) {
 				try {
 					ois = new ObjectInputStream(new FileInputStream(fich1));
 					while (!finArchivo && !encontrado) {
@@ -178,9 +179,11 @@ public class Main {
 						}
 					}
 					ois.close();
+				
 				} catch (IOException | ClassNotFoundException e) {
 					System.err.println("Error al procesar el archivo: " + e.getMessage());
-					break;
+					error=true;	
+				}
 				}
 				if (!encontrado) {
 					System.out.println("El código de entrenador no existe. Reintente.");
@@ -265,14 +268,13 @@ public class Main {
 
 	private static void aniadirEntrenador(File fich1, File fich2) {
 		ObjectInputStream ois = null;
-		String nom, pais, jug_base, cod_e = null;
+		String nom, pais, jug_base, cod_e = null, cod;
 		LocalDate fecha;
 		double sueldo;
 		int edad, cont = 0;
 		HashMap<String, Ejercicio> ejercicios = new HashMap<>();
 		boolean encontrado = false;
 		boolean finArchivo = false;
-
 		System.out.println("Introduce el nombre: ");
 		nom = Utilidades.introducirCadena();
 		System.out.println("Introduce la edad: ");
@@ -336,7 +338,7 @@ public class Main {
 				}
 			}
 
-			String cod = "ENT - " + (cont + 1);
+			cod = "ENT - " + (cont + 1);
 			Entrenador ent = new Entrenador(cod, nom, edad, fecha, pais, sueldo, cod_e, jug_base, ejercicios);
 
 			try {
