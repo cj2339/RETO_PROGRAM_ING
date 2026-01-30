@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import clases.*;
+import excepciones.MaxEntException;
+import excepciones.MaxJugException;
 import utilidades.Utilidades;
 import utilidades.MyObjectOutputStream;
 
@@ -161,29 +163,29 @@ public class Main {
 				cod_e = Utilidades.introducirCadena();
 				finArchivo = false;
 				while(!error) {
-				try {
-					ois = new ObjectInputStream(new FileInputStream(fich1));
-					while (!finArchivo && !encontrado) {
-						try {
-							Object obj = ois.readObject();
-							if (obj instanceof Entrenador) {
-								Entrenador ent = (Entrenador) obj;
-								if (ent.getCod_e().equalsIgnoreCase(cod_e)) {
-									encontrado = true;
-									ent.getEjercicio().put(cod_ej, ejercicio);
-									System.out.println("Entrenamiento añadido con éxito.");
+					try {
+						ois = new ObjectInputStream(new FileInputStream(fich1));
+						while (!finArchivo && !encontrado) {
+							try {
+								Object obj = ois.readObject();
+								if (obj instanceof Entrenador) {
+									Entrenador ent = (Entrenador) obj;
+									if (ent.getCod_e().equalsIgnoreCase(cod_e)) {
+										encontrado = true;
+										ent.getEjercicio().put(cod_ej, ejercicio);
+										System.out.println("Entrenamiento añadido con éxito.");
+									}
 								}
+							} catch (EOFException e) {
+								finArchivo = true;
 							}
-						} catch (EOFException e) {
-							finArchivo = true;
 						}
+						ois.close();
+
+					} catch (IOException | ClassNotFoundException e) {
+						System.err.println("Error al procesar el archivo: " + e.getMessage());
+						error=true;	
 					}
-					ois.close();
-				
-				} catch (IOException | ClassNotFoundException e) {
-					System.err.println("Error al procesar el archivo: " + e.getMessage());
-					error=true;	
-				}
 				}
 				if (!encontrado) {
 					System.out.println("El código de entrenador no existe. Reintente.");
@@ -267,95 +269,147 @@ public class Main {
 	}
 
 	private static void aniadirEntrenador(File fich1, File fich2) {
-		ObjectInputStream ois = null;
-		String nom, pais, jug_base, cod_e = null, cod;
-		LocalDate fecha;
-		double sueldo;
-		int edad, cont = 0;
-		HashMap<String, Ejercicio> ejercicios = new HashMap<>();
-		boolean encontrado = false;
-		boolean finArchivo = false;
-		System.out.println("Introduce el nombre: ");
-		nom = Utilidades.introducirCadena();
-		System.out.println("Introduce la edad: ");
-		edad = Utilidades.leerInt(18, 80);
-		System.out.println("Introduce la fecha de entrada: ");
-		fecha = Utilidades.leerFechaAMD();
-		System.out.println("Introduce el pais: ");
-		pais = Utilidades.introducirCadena();
-		System.out.println("Introduce el sueldo: ");
-		sueldo = Utilidades.leerDouble();
+	    ObjectInputStream ois = null;
+	    String nom, pais, jug_base, cod_e = null, cod;
+	    LocalDate fecha;
+	    double sueldo;
+	    int edad, cont = 0;
+	    HashMap<String, Ejercicio> ejercicios = new HashMap<>();
+	    boolean encontrado = false;
+	    boolean finArchivo = false, error=false;
+	    boolean finCount = false;
+	    int entrenadoresEnEquipo = 0;
 
-		if (!fich2.exists()) {
-			System.out.println("No hay equipos registrados. No se puede añadir un entrenador.");
-		} else {
+	    System.out.println("Introduce el nombre: ");
+	    nom = Utilidades.introducirCadena();
+	    System.out.println("Introduce la edad: ");
+	    edad = Utilidades.leerInt(18, 80);
+	    System.out.println("Introduce la fecha de entrada: ");
+	    fecha = Utilidades.leerFechaAMD();
+	    System.out.println("Introduce el pais: ");
+	    pais = Utilidades.introducirCadena();
+	    System.out.println("Introduce el sueldo: ");
+	    sueldo = Utilidades.leerDouble();
 
-			do {
-				System.out.println("Equipos disponibles:");
-				mostrarEquipos(fich2);
+	    if (!fich2.exists()) {
+	        System.out.println("No hay equipos registrados. No se puede añadir un entrenador.");
+	    } else {
 
-				System.out.println("Introduce el codigo del equipo: ");
-				cod_e = Utilidades.introducirCadena();
+	        do {
+	            System.out.println("Equipos disponibles:");
+	            mostrarEquipos(fich2);
 
-				try {
-					ois = new ObjectInputStream(new FileInputStream(fich2));
-					while (!finArchivo) {
-						Equipo equipo = (Equipo) ois.readObject();
-						if (equipo.getCod_e().equalsIgnoreCase(cod_e)) {
-							encontrado = true;
-							finArchivo = true;
-						}
+	            System.out.println("Introduce el codigo del equipo: ");
+	            cod_e = Utilidades.introducirCadena();
 
-					}
-					ois.close();
-				} catch (EOFException e) {
-					finArchivo = true;
-				} catch (IOException | ClassNotFoundException e) {
-					System.err.println("Error al leer equipos: " + e.getMessage());
-				}
+	            try {
+	                ois = new ObjectInputStream(new FileInputStream(fich2));
+	                finArchivo = false; 
+	                while (!finArchivo) {
+	                    try {
+	                        Equipo equipo = (Equipo) ois.readObject();
+	                        if (equipo.getCod_e().equalsIgnoreCase(cod_e)) {
+	                            encontrado = true;
+	                            finArchivo = true; // Salimos del bucle
+	                        }
+	                    } catch (EOFException e) {
+	                        finArchivo = true;
+	                    }
+	                }
+	                ois.close();
+	            } catch (IOException | ClassNotFoundException e) {
+	                System.err.println("Error al leer equipos: " + e.getMessage());
+	            }
 
-				if (!encontrado) {
-					System.out.println("El equipo no existe. Reintente.");
-				}
-				finArchivo = false;
-			} while (!encontrado);
+	            if (!encontrado) {
+	                System.out.println("El equipo no existe. Reintente.");
+	            } else {
+	                
+	                // --- BLOQUE DE VALIDACIÓN DE ENTRENADORES MÁXIMOS ---
+	                
+	                if (fich1.exists()) {
+	                    ObjectInputStream oisCount = null;
+	                    try {
+	                        oisCount = new ObjectInputStream(new FileInputStream(fich1));
+	                        
+	                        while (!finCount) {
+	                            try {
+	                                Object obj = oisCount.readObject();
+	                                if (obj instanceof Entrenador) {
+	                                    Entrenador trainer = (Entrenador) obj;
+	                                    if (trainer.getCod_e().equalsIgnoreCase(cod_e)) {
+	                                        entrenadoresEnEquipo++;
+	                                    }
+	                                }
+	                            } catch (EOFException e) {
+	                                finCount = true;
+	                            }
+	                        }
+	                    } catch (IOException | ClassNotFoundException e) {
+	                         System.err.println("Error verificando entrenadores: " + e.getMessage());
+	                    } finally {
+	                        try {
+	                        	if (oisCount != null) {
+	                        	oisCount.close();
+	                        	}
+	                        	} catch (IOException e) {
+	                        		
+	                        	}
+	                    }
+	                }
 
-			System.out.println("Introduce la jugada base: ");
-			jug_base = Utilidades.introducirCadena();
+	                try {
+	                    if (entrenadoresEnEquipo >= 3&&!error) {
+	                        throw new MaxEntException();
+	                    }
+	                } catch (MaxEntException e) {
+	                    System.out.println("ERROR: El equipo " + cod_e + " ya tiene 3 entrenadores. Debe eliminar uno antes de añadir otro.");
+	                    error=true;
+	                }
+	            }
 
-			if (fich1.exists()) {
-				try {
-					ois = new ObjectInputStream(new FileInputStream(fich1));
-					while (!finArchivo) {
-						ois.readObject();
-						cont++;
-					}
-					ois.close();
-				} catch (EOFException e) {
-					finArchivo = true;
-				} catch (Exception e) {
-					System.err.println("Error al contar registros: " + e.getMessage());
-				}
-			}
+	        } while (!encontrado);
 
-			cod = "ENT - " + (cont + 1);
-			Entrenador ent = new Entrenador(cod, nom, edad, fecha, pais, sueldo, cod_e, jug_base, ejercicios);
+	        System.out.println("Introduce la jugada base: ");
+	        jug_base = Utilidades.introducirCadena();
 
-			try {
-				if (!fich1.exists()) {
-					try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fich1))) {
-						oos.writeObject(ent);
-					}
-				} else {
-					try (MyObjectOutputStream moos = new MyObjectOutputStream(new FileOutputStream(fich1, true))) {
-						moos.writeObject(ent);
-					}
-				}
-				System.out.println("Entrenador añadido con éxito. Código: " + cod);
-			} catch (IOException e) {
-				System.err.println("Error al escribir: " + e.getMessage());
-			}
-		}
+	        // Contar para generar ID (ENT - X)
+	        finArchivo = false;
+	        if (fich1.exists()) {
+	            try {
+	                ois = new ObjectInputStream(new FileInputStream(fich1));
+	                while (!finArchivo) {
+	                    try {
+	                        ois.readObject();
+	                        cont++;
+	                    } catch (EOFException e) {
+	                        finArchivo = true;
+	                    }
+	                }
+	                ois.close();
+	            } catch (Exception e) {
+	                System.err.println("Error al contar registros: " + e.getMessage());
+	            }
+	        }
+
+	        cod = "ENT - " + (cont + 1);
+	        Entrenador ent = new Entrenador(cod, nom, edad, fecha, pais, sueldo, cod_e, jug_base, ejercicios);
+
+	        try {
+	            if (!fich1.exists()) {
+	                try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fich1))) {
+	                    oos.writeObject(ent);
+	                }
+	            } else {
+	                try (MyObjectOutputStream moos = new MyObjectOutputStream(new FileOutputStream(fich1, true))) {
+	                    moos.writeObject(ent);
+	                }
+	            }
+	            System.out.println("Entrenador añadido con éxito. Código: " + cod);
+	        } catch (IOException e) {
+	            System.err.println("Error al escribir: " + e.getMessage());
+	        }
+	    }
 	}
 
 	private static void mostrarEquipos(File fich) {
@@ -373,42 +427,88 @@ public class Main {
 	}
 
 	private static void aniadirJugador(File fich1) {
-		String nombre_s, pais, cod_e, tipo, cod_j="JUG - ", cod_ju;
-		int edad, puntos, cont=0;
+		String nombre_s, pais, cod_e, tipo, cod_j = "JUG - ", cod_ju;
+		int edad, puntos, cont = 0;
 		double sueldo;
 		LocalDate fechaIncor;
 		ObjectOutputStream oos;
 		MyObjectOutputStream moos;
 		boolean finArchivo = false;
 		ObjectInputStream ois = null;
-		POSICION posicion = null;// Hubo un importe aqui
-		boolean correcto=true;		
+		POSICION posicion = null;
+		boolean correcto = true;
+		int jugadoresEnEquipo = 0;
+		boolean finCount = false;
+
 		System.out.println("Introduce el nombre del Staff: ");
-		nombre_s=Utilidades.introducirCadena();
+		nombre_s = Utilidades.introducirCadena();
 		System.out.println("Introduce la edad: ");
-		edad=Utilidades.leerInt();
+		edad = Utilidades.leerInt();
 		System.out.println("Introduce la fecha de incorporación:(A/M/D) ");
-		fechaIncor=Utilidades.leerFechaAMD();
+		fechaIncor = Utilidades.leerFechaAMD();
 		System.out.println("Introduce el pais: ");
-		pais=Utilidades.introducirCadena();
+		pais = Utilidades.introducirCadena();
 		System.out.println("Introduce el sueldo: ");
-		sueldo=Utilidades.leerDouble();
-		System.out.println("Introduce el codigo del entrenamiento: ");
-		cod_e=Utilidades.introducirCadena();
+		sueldo = Utilidades.leerDouble();
+		System.out.println("Introduce el codigo del equipo al que pertenece: ");
+		cod_e = Utilidades.introducirCadena();
+
+
+		if (fich1.exists()) {
+			ObjectInputStream oisCount = null;
+			try {
+				oisCount = new ObjectInputStream(new FileInputStream(fich1));
+				while (!finCount) {
+					try {
+						Staff st = (Staff) oisCount.readObject();
+						if (st instanceof Jugador) {
+							Jugador jug = (Jugador) st;
+							if (jug.getCod_e().equalsIgnoreCase(cod_e)) {
+								jugadoresEnEquipo++;
+							}
+						}
+					} catch (EOFException e) {
+						finCount = true;
+					}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error al verificar cantidad de jugadores: " + e.getMessage());
+			} finally {
+				try { 
+					if (oisCount != null){
+					oisCount.close();
+				} 
+				} catch (IOException e) {
+					
+				}
+			}
+		}
+
+		try {
+			if (jugadoresEnEquipo >= 15) {
+				throw new MaxJugException();
+			}
+		} catch (MaxJugException e) {
+			System.out.println("ERROR: El equipo " + cod_e + " ya tiene 15 jugadores. No se pueden añadir más.");
+			return; // Salimos del método para no guardar datos
+		}
+
 		System.out.println("Introduce los puntos del jugador: ");
-		puntos=Utilidades.leerInt();
+		puntos = Utilidades.leerInt();
 		do {
 			System.out.println("Introduce la posicion del jugador: (BASE, ALERO, PIVOT)");
-			tipo=Utilidades.introducirCadena();
+			tipo = Utilidades.introducirCadena();
 			try {
 				posicion = POSICION.valueOf(tipo);
-				correcto=true;
+				correcto = true;
 			} catch (IllegalArgumentException e) {
 				System.err.println("El valor '" + tipo + "' no es una posicion válida.");
-				correcto=false;
+				correcto = false;
 			}
-		}while(!correcto);
+		} while (!correcto);
 
+		// Contar total de registros para generar el ID (JUG - X)
+		finArchivo = false;
 		if (fich1.exists()) {
 			try {
 				ois = new ObjectInputStream(new FileInputStream(fich1));
@@ -420,31 +520,32 @@ public class Main {
 				finArchivo = true;
 			} catch (Exception e) {
 				System.err.println("Error al contar registros: " + e.getMessage());
+			} finally {
+				try { if (ois != null) ois.close(); } catch (IOException e) {}
 			}
 		}
 
-		cod_ju=cod_j+(cont+1);
-		System.out.println("El codigo del jugador es "+cod_ju);
-		Jugador j=new Jugador(cod_ju, nombre_s,  edad,  fechaIncor,  pais,  sueldo,  cod_e,  puntos, posicion);// hubo un importe aqui
-		if(!fich1.exists()) {
+		cod_ju = cod_j + (cont + 1);
+		System.out.println("El codigo del jugador es " + cod_ju);
+		Jugador j = new Jugador(cod_ju, nombre_s, edad, fechaIncor, pais, sueldo, cod_e, puntos, posicion);
+
+		if (!fich1.exists()) {
 			try {
 				oos = new ObjectOutputStream(new FileOutputStream(fich1));
 				oos.writeObject(j);
 				oos.close();
-			} catch (FileNotFoundException e) {
-				System.out.println("No se encontró el fichero");
+				System.out.println("Jugador añadido correctamente.");
 			} catch (IOException e) {
-				System.out.println("Error leyendo el fichero");
+				System.out.println("Error escribiendo el fichero");
 			}
-		}else {
+		} else {
 			try {
-				moos = new MyObjectOutputStream(new FileOutputStream(fich1));
+				moos = new MyObjectOutputStream(new FileOutputStream(fich1, true)); // true para append
 				moos.writeObject(j);
 				moos.close();
-			} catch (FileNotFoundException e) {
-				System.out.println("No se encontró el fichero");
+				System.out.println("Jugador añadido correctamente.");
 			} catch (IOException e) {
-				System.out.println("Error leyendo el fichero");
+				System.out.println("Error escribiendo el fichero");
 			}
 		}
 	}
