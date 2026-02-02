@@ -85,7 +85,7 @@ public class Main {
 					// guardara la info para que se traspase.
 					break;
 				case 10:
-					mostrarJugadoresPos();
+					mostrarJugadoresPos(fich1);
 					// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
 					// este en el enum. Se mostraran los juadores de dicha posicion
 					break;
@@ -107,7 +107,58 @@ public class Main {
 
 	}
 
-	private static void mostrarJugadoresPos() {
+	private static void mostrarJugadoresPos(File fich1) {
+		ObjectInputStream ois = null;
+		String posi = "";
+		POSICION p = null;
+		boolean posicionCorrecta = false;
+		boolean finArchivo = false;
+		Staff s = null;
+		Jugador j = null;
+
+		if (!fich1.exists()) {
+			System.out.println("No hay personal registrado. No se puede comprobar los jugadores por posición.");
+		} else {
+			while (!posicionCorrecta) {
+				System.out.println("Introduce la posicion (BASE, ALERO, PIVOT): ");
+				posi = Utilidades.introducirCadena().toUpperCase();
+				try {
+					p = POSICION.valueOf(posi);
+					posicionCorrecta = true;
+				} catch (IllegalArgumentException e) {
+					System.out.println("Posicion incorrecta. Intentalo de nuevo.");
+				}
+			}
+
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich1));
+				while (!finArchivo) {
+					try {
+						s = (Staff) ois.readObject();
+						if (s instanceof Jugador) {
+							j = (Jugador) s;
+							if (j.getPosicion().equals(p)) {
+								j.visualizar();
+								System.out.println("-----------------------------");
+							}
+						}
+					} catch (EOFException e) {
+						finArchivo = true;
+					}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error al leer el archivo: " + e.getMessage());
+			} finally {
+				if (ois != null) {
+					try {
+						ois.close();
+					} catch (IOException e) {
+						System.err.println("Error al cerrar el flujo: " + e.getMessage());
+					}
+				}
+			}
+
+		}
 
 	}
 
@@ -129,6 +180,108 @@ public class Main {
 
 	private static void eliminarJugador() {
 
+	}
+
+	public static void comprobarEquiposMinJugEnt(File fich1, File fich2) {
+		HashMap<String, int[]> conteoEquipos = new HashMap<>(); // [0] = Jugadores, [1] = Entrenadores
+		boolean finArchivo = false;
+		ObjectInputStream ois = null;
+		boolean continuar = true;
+		Equipo eq = null;
+		Staff st = null;
+		int[] contadores = null;
+		boolean todoCorrecto = true;
+		int numJugadores = 0;
+		int numEntrenadores = 0;
+		int[] datos = null;
+
+		// 1. Cargar todos los códigos de equipo en el mapa
+		if (!fich2.exists()) {
+			System.out.println("El fichero de equipos no existe.");
+			continuar = false;
+		} else {
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich2));
+				while (!finArchivo) {
+					try {
+						eq = (Equipo) ois.readObject();
+						conteoEquipos.put(eq.getCod_e(), new int[] { 0, 0 });
+					} catch (EOFException e) {
+						finArchivo = true;
+					}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error al leer Equipos.dat: " + e.getMessage());
+			} finally {
+				if (ois != null) {
+					try {
+						ois.close();
+					} catch (IOException e) {
+						// Ignorar error al cerrar
+					}
+				}
+			}
+		}
+
+		// 2. Recorrer staffs y contar si todo ha ido bien
+		if (continuar) {
+			if (!fich1.exists()) {
+				System.out.println("El fichero de staffs no existe.");
+				continuar = false;
+			} else {
+				finArchivo = false;
+				try {
+					ois = new ObjectInputStream(new FileInputStream(fich1));
+					while (!finArchivo) {
+						try {
+							st = (Staff) ois.readObject();
+							if (conteoEquipos.containsKey(st.getCod_e())) {
+								contadores = conteoEquipos.get(st.getCod_e());
+								if (st instanceof Jugador) {
+									contadores[0]++;
+								} else if (st instanceof Entrenador) {
+									contadores[1]++;
+								}
+							}
+						} catch (EOFException e) {
+							finArchivo = true;
+						}
+					}
+				} catch (IOException | ClassNotFoundException e) {
+					System.err.println("Error al leer Staffs.dat: " + e.getMessage());
+				} finally {
+					if (ois != null) {
+						try {
+							ois.close();
+						} catch (IOException e) {
+							// Ignorar error al cerrar
+						}
+					}
+				}
+			}
+		}
+
+		// 3. Verificar y mostrar resultados
+		if (continuar) {
+			System.out.println("\n--- Informe de validación de Equipos ---");
+			for (String codEquipo : conteoEquipos.keySet()) {
+				datos = conteoEquipos.get(codEquipo);
+				numJugadores = datos[0];
+				numEntrenadores = datos[1];
+
+				if (numJugadores < 5 || numEntrenadores < 1) {
+					todoCorrecto = false;
+					System.out.println("ALERTA: El equipo " + codEquipo + " no cumple los requisitos.");
+					System.out.println("\tJugadores: " + numJugadores + " (Mínimo 5)");
+					System.out.println("\tEntrenadores: " + numEntrenadores + " (Mínimo 1)");
+				}
+			}
+
+			if (todoCorrecto) {
+				System.out.println("Todos los equipos cumplen con los requisitos mínimos (5 jugadores, 1 entrenador).");
+			}
+			System.out.println("----------------------------------------");
+		}
 	}
 
 	private static void aniadirEntrenamiento(File fich1) {
@@ -703,6 +856,7 @@ public class Main {
 
 	public static void saveDataJugadores(File fich1) {
 		int i = 1; // Contador para el autoincremento del código "JUG - X"
+		int k = 1; // Contador para el autoincremento del código "ENT - X"
 
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fich1))) {
 
@@ -742,7 +896,183 @@ public class Main {
 			oos.writeObject(new Jugador("JUG - " + i++, "Tomas Satoransky", 31, LocalDate.of(2022, 6, 20), "Rep. Checa",
 					3100, "BAR - 1", 160, POSICION.BASE));
 
-			System.out.println("Escritura directa finalizada: 15 jugadores guardados en Staffs.dat");
+			// --- Equipo: UNI - 1 (Unicaja) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Alberto Díaz", 29, LocalDate.of(2016, 7, 1), "España", 2100,
+					"UNI - 1", 130, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Kendrick Perry", 30, LocalDate.of(2022, 6, 15), "USA", 2400,
+					"UNI - 1", 180, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Nihad Djedovic", 33, LocalDate.of(2022, 7, 10), "Bosnia", 2000,
+					"UNI - 1", 140, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Melvin Ejim", 32, LocalDate.of(2022, 7, 12), "Canadá", 1900,
+					"UNI - 1", 150, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "David Kravish", 30, LocalDate.of(2022, 6, 25), "USA", 2200,
+					"UNI - 1", 170, POSICION.PIVOT));
+
+			// --- Equipo: VAL - 1 (Valencia) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Chris Jones", 30, LocalDate.of(2022, 6, 20), "USA", 2800,
+					"VAL - 1", 220, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Jared Harper", 26, LocalDate.of(2022, 7, 15), "USA", 2300,
+					"VAL - 1", 160, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Josep Puerto", 24, LocalDate.of(2017, 8, 1), "España", 1500,
+					"VAL - 1", 110, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Víctor Claver", 35, LocalDate.of(2021, 7, 15), "España", 2000,
+					"VAL - 1", 130, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Brandon Davies", 32, LocalDate.of(2023, 7, 5), "USA", 3200,
+					"VAL - 1", 250, POSICION.PIVOT));
+
+			// --- Equipo: LEN - 1 (Tenerife) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Marcelinho Huertas", 40, LocalDate.of(2019, 7, 1), "Brasil",
+					2500, "LEN - 1", 200, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Bruno Fitipaldo", 32, LocalDate.of(2020, 7, 10), "Uruguay",
+					1800, "LEN - 1", 150, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Sasu Salin", 32, LocalDate.of(2019, 7, 12), "Finlandia", 1700,
+					"LEN - 1", 160, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Aaron Doornekamp", 37, LocalDate.of(2020, 7, 15), "Canadá",
+					1600, "LEN - 1", 140, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Giorgi Shermadini", 34, LocalDate.of(2019, 7, 5), "Georgia",
+					3000, "LEN - 1", 280, POSICION.PIVOT));
+
+			// --- Equipo: GRA - 1 (Gran Canaria) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Andrew Albicy", 33, LocalDate.of(2020, 7, 1), "Francia", 2000,
+					"GRA - 1", 140, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Ferran Bassas", 31, LocalDate.of(2022, 7, 10), "España", 1700,
+					"GRA - 1", 130, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Nico Brussino", 30, LocalDate.of(2021, 7, 5), "Argentina",
+					2100, "GRA - 1", 180, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "John Shurna", 33, LocalDate.of(2019, 7, 20), "USA", 1900,
+					"GRA - 1", 150, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Ben Lammers", 27, LocalDate.of(2023, 7, 15), "USA", 2200,
+					"GRA - 1", 160, POSICION.PIVOT));
+
+			// --- Equipo: BAS - 1 (Baskonia) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Markus Howard", 24, LocalDate.of(2022, 7, 15), "USA", 3500,
+					"BAS - 1", 250, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Codi Miller-McIntyre", 29, LocalDate.of(2023, 7, 10), "USA",
+					2800, "BAS - 1", 180, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Tadas Sedekerskis", 25, LocalDate.of(2018, 8, 1), "Lituania",
+					2200, "BAS - 1", 170, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Vanja Marinkovic", 26, LocalDate.of(2021, 7, 15), "Serbia",
+					2000, "BAS - 1", 160, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Matt Costello", 30, LocalDate.of(2021, 7, 10), "C. Marfil",
+					2600, "BAS - 1", 210, POSICION.PIVOT));
+
+			// --- Equipo: BAX - 1 (Manresa) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Dani Pérez", 33, LocalDate.of(2019, 7, 1), "España", 1600,
+					"BAX - 1", 140, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Brancou Badio", 24, LocalDate.of(2022, 2, 1), "Senegal", 1500,
+					"BAX - 1", 150, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Musa Sagnia", 20, LocalDate.of(2022, 8, 1), "Gambia", 1000,
+					"BAX - 1", 90, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Devin Robinson", 28, LocalDate.of(2022, 7, 15), "USA", 2100,
+					"BAX - 1", 190, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Martinas Geben", 29, LocalDate.of(2023, 1, 15), "Lituania",
+					1800, "BAX - 1", 160, POSICION.PIVOT));
+
+			// --- Equipo: JOV - 1 (Joventut) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Andrés Feliz", 26, LocalDate.of(2021, 7, 10), "Rep. Dom.",
+					2300, "JOV - 1", 180, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Guillem Vives", 30, LocalDate.of(2021, 7, 5), "España", 1900,
+					"JOV - 1", 140, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Pep Busquets", 24, LocalDate.of(2019, 8, 1), "España", 1200,
+					"JOV - 1", 100, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Yannick Kraag", 21, LocalDate.of(2020, 9, 10), "Países Bajos",
+					1100, "JOV - 1", 90, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Ante Tomic", 36, LocalDate.of(2020, 7, 1), "Croacia", 3500,
+					"JOV - 1", 250, POSICION.PIVOT));
+
+			// --- Equipo: UCA - 1 (Murcia) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Ludde Hakanson", 27, LocalDate.of(2023, 7, 1), "Suecia", 2100,
+					"UCA - 1", 160, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Dylan Ennis", 32, LocalDate.of(2023, 6, 25), "Canadá", 2400,
+					"UCA - 1", 190, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Howard Sant-Roos", 32, LocalDate.of(2023, 7, 20), "Cuba", 2300,
+					"UCA - 1", 170, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Rodions Kurucs", 25, LocalDate.of(2023, 7, 25), "Letonia",
+					2000, "UCA - 1", 150, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Simon Birgander", 25, LocalDate.of(2023, 7, 1), "Suecia", 2200,
+					"UCA - 1", 210, POSICION.PIVOT));
+
+			// --- Equipo: CAS - 1 (Zaragoza) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Trae Bell-Haynes", 28, LocalDate.of(2023, 7, 15), "Canadá",
+					2000, "CAS - 1", 160, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Santi Yusta", 26, LocalDate.of(2021, 7, 10), "España", 1800,
+					"CAS - 1", 150, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Miguel González", 24, LocalDate.of(2023, 7, 20), "España",
+					1400, "CAS - 1", 100, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Emir Sulejmanovic", 28, LocalDate.of(2023, 7, 5), "Bosnia",
+					1900, "CAS - 1", 140, POSICION.PIVOT));
+			oos.writeObject(new Jugador("JUG - " + i++, "Jahlil Okafor", 27, LocalDate.of(2023, 8, 1), "Nigeria", 3000,
+					"CAS - 1", 200, POSICION.PIVOT));
+
+			// --- Equipo: SUR - 1 (Bilbao) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Alex Renfroe", 37, LocalDate.of(2023, 7, 1), "USA", 2100,
+					"SUR - 1", 170, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Adam Smith", 30, LocalDate.of(2022, 7, 15), "USA", 2200,
+					"SUR - 1", 180, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Xavi Rabaseda", 34, LocalDate.of(2022, 7, 10), "España", 1800,
+					"SUR - 1", 130, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Denzel Andersson", 26, LocalDate.of(2022, 7, 20), "Suecia",
+					1600, "SUR - 1", 120, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Sacha Killeya-Jones", 25, LocalDate.of(2023, 7, 5), "UK", 2300,
+					"SUR - 1", 190, POSICION.PIVOT));
+
+			// --- Equipo: RIO - 1 (Breogan) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Sergi García", 26, LocalDate.of(2022, 7, 1), "España", 1700,
+					"RIO - 1", 140, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Stefan Momirov", 23, LocalDate.of(2022, 7, 10), "Serbia", 1600,
+					"RIO - 1", 130, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Matas Jogela", 25, LocalDate.of(2023, 7, 15), "Lituania", 1800,
+					"RIO - 1", 150, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Toni Nakic", 24, LocalDate.of(2022, 7, 20), "Croacia", 1700,
+					"RIO - 1", 140, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Martynas Sajus", 27, LocalDate.of(2023, 7, 5), "Lituania",
+					2000, "RIO - 1", 160, POSICION.PIVOT));
+
+			// --- Equipo: COV - 1 (Granada) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Lluís Costa", 30, LocalDate.of(2020, 7, 1), "España", 1800,
+					"COV - 1", 150, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Christian Díaz", 31, LocalDate.of(2020, 7, 5), "España", 1600,
+					"COV - 1", 130, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Pere Tomàs", 33, LocalDate.of(2021, 7, 10), "España", 1700,
+					"COV - 1", 140, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Kwan Cheatham", 27, LocalDate.of(2023, 7, 15), "USA", 1900,
+					"COV - 1", 160, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Cristiano Felicio", 31, LocalDate.of(2022, 8, 1), "Brasil",
+					2500, "COV - 1", 200, POSICION.PIVOT));
+
+			// --- ENTRENADORES ---
+			oos.writeObject(new Entrenador("ENT - " + k++, "Natxo Lezcano", 50, LocalDate.of(2022, 6, 1), "España",
+					50000, "MOR - 1", "Defensa Zonal", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Chus Mateo", 54, LocalDate.of(2022, 7, 1), "España", 80000,
+					"REA - 1", "Ataque Rápido", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Roger Grimau", 45, LocalDate.of(2023, 6, 26), "España",
+					70000, "BAR - 1", "Pick and Roll", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Ibon Navarro", 47, LocalDate.of(2022, 2, 1), "España",
+					55000, "UNI - 1", "Presión Alta", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Álex Mumbrú", 44, LocalDate.of(2022, 6, 14), "España",
+					55000, "VAL - 1", "Juego Interior", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Txus Vidorreta", 57, LocalDate.of(2018, 6, 1), "España",
+					60000, "LEN - 1", "Tiro Exterior", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Jaka Lakovic", 45, LocalDate.of(2022, 6, 17), "Eslovenia",
+					58000, "GRA - 1", "Transición", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Joan Peñarroya", 54, LocalDate.of(2022, 6, 1), "España",
+					65000, "BAS - 1", "Ritmo Alto", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Pedro Martínez", 62, LocalDate.of(2019, 6, 24), "España",
+					60000, "BAX - 1", "Juego Dinámico", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Carles Duran", 47, LocalDate.of(2018, 2, 7), "España",
+					55000, "JOV - 1", "Cantera", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Sito Alonso", 47, LocalDate.of(2019, 1, 28), "España",
+					50000, "UCA - 1", "Defensa Agresiva", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Porfirio Fisac", 58, LocalDate.of(2022, 10, 1), "España",
+					55000, "CAS - 1", "Táctica", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Jaume Ponsarnau", 52, LocalDate.of(2022, 6, 20), "España",
+					50000, "SUR - 1", "Orden", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Veljko Mrsic", 52, LocalDate.of(2022, 1, 21), "Croacia",
+					48000, "RIO - 1", "Físico", new HashMap<>()));
+			oos.writeObject(new Entrenador("ENT - " + k++, "Pablo Pin", 40, LocalDate.of(2012, 8, 1), "España", 45000,
+					"COV - 1", "Continuidad", new HashMap<>()));
+
+			System.out.println("Escritura directa finalizada: 75 jugadores y 15 entrenadores guardados en Staffs.dat");
 			oos.close();
 
 		} catch (IOException e) {
