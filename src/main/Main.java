@@ -133,10 +133,17 @@ public class Main {
 
 	private static void aniadirEntrenamiento(File fich1) {
 		boolean encontrado = false;
-		String cod_e, cod_ej, nom, descripcion;
-		int duracion, dificultad;
+		boolean finArchivo = false;
+		boolean error = false;
+		String cod_entrenador = "", cod_ej = "", nom = "", descripcion = "";
+		int duracion = 0, dificultad = 0;
+		int i = 0;
 		ObjectInputStream ois = null;
-		boolean finArchivo = false, error = false;
+		ObjectOutputStream oos = null;
+		ArrayList<Staff> listaStaff = new ArrayList<>();
+		Staff st = null;
+		Entrenador ent = null;
+		Ejercicio ejercicio = null;
 
 		if (!fich1.exists()) {
 			System.out.println("No hay personal registrado. No se puede añadir un entrenamiento.");
@@ -154,40 +161,55 @@ public class Main {
 			System.out.println("Introduce la descripcion del entrenamiento: ");
 			descripcion = Utilidades.introducirCadena();
 
-			Ejercicio ejercicio = new Ejercicio(cod_ej, nom, descripcion, dificultad, duracion);
+			ejercicio = new Ejercicio(cod_ej, nom, descripcion, dificultad, duracion);
 
 			do {
 				System.out.println("Entrenadores disponibles:");
 				mostrarEntrenadores(fich1);
 				System.out.println("Introduce el codigo del Entrenador al que quieres añadirle el entrenamiento: ");
-				cod_e = Utilidades.introducirCadena();
-				finArchivo = false;
-				while (!error) {
-					try {
-						ois = new ObjectInputStream(new FileInputStream(fich1));
-						while (!finArchivo && !encontrado) {
-							try {
-								Object obj = ois.readObject();
-								if (obj instanceof Entrenador) {
-									Entrenador ent = (Entrenador) obj;
-									if (ent.getCod_e().equalsIgnoreCase(cod_e)) {
-										encontrado = true;
-										ent.getEjercicio().put(cod_ej, ejercicio);
-										System.out.println("Entrenamiento añadido con éxito.");
-									}
-								}
-							} catch (EOFException e) {
-								finArchivo = true;
-							}
-						}
-						ois.close();
+				cod_entrenador = Utilidades.introducirCadena();
 
-					} catch (IOException | ClassNotFoundException e) {
-						System.err.println("Error al procesar el archivo: " + e.getMessage());
-						error = true;
+				finArchivo = false;
+				encontrado = false;
+				error = false;
+				listaStaff.clear();
+
+				try {
+					ois = new ObjectInputStream(new FileInputStream(fich1));
+					while (!finArchivo) {
+						try {
+							st = (Staff) ois.readObject();
+							if (st instanceof Entrenador) {
+								ent = (Entrenador) st;
+								if (ent.getCod_s().equalsIgnoreCase(cod_entrenador)) {
+									encontrado = true;
+									ent.getEjercicio().put(cod_ej, ejercicio);
+								}
+							}
+							listaStaff.add(st);
+						} catch (EOFException e) {
+							finArchivo = true;
+						}
 					}
+					ois.close();
+				} catch (IOException | ClassNotFoundException e) {
+					System.err.println("Error al procesar el archivo: " + e.getMessage());
+					error = true;
 				}
-				if (!encontrado) {
+
+				if (!error && encontrado) {
+					try {
+						oos = new ObjectOutputStream(new FileOutputStream(fich1));
+						for (i = 0; i < listaStaff.size(); i++) {
+							st = listaStaff.get(i);
+							oos.writeObject(st);
+						}
+						oos.close();
+						System.out.println("Entrenamiento añadido con éxito.");
+					} catch (IOException e) {
+						System.err.println("Error al guardar cambios: " + e.getMessage());
+					}
+				} else if (!encontrado) {
 					System.out.println("El código de entrenador no existe. Reintente.");
 				}
 			} while (!encontrado);
@@ -738,7 +760,7 @@ public class Main {
 				Jugador jugador = (Jugador) ois.readObject();
 				jugador.visualizar();
 			}
-			
+
 			ois.close();
 		} catch (EOFException e) {
 			finArchivo = true;

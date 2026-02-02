@@ -1,12 +1,18 @@
 package clases;
 
-public class Ejercicio {
+import java.io.Serializable;
+
+public class Ejercicio implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String cod_ej;
 	private String nom_ej;
 	private String descrip;
-	private int dificultad; //del 1 al 5, a saber como lo  hacemos.
+	private int dificultad; // del 1 al 5, a saber como lo hacemos.
 	private int duracion;
-	
+
 	public Ejercicio(String cod_ej, String nom_ej, String descrip, int dificultad, int duracion) {
 		this.cod_ej = cod_ej;
 		this.nom_ej = nom_ej;
@@ -14,7 +20,7 @@ public class Ejercicio {
 		this.dificultad = dificultad;
 		this.duracion = duracion;
 	}
-	
+
 	public Ejercicio() {
 		this.cod_ej = "";
 		this.nom_ej = "";
@@ -62,4 +68,11 @@ public class Ejercicio {
 	public void setDuracion(int duracion) {
 		this.duracion = duracion;
 	}
+
+	@Override
+	public String toString() {
+		return "Ejercicio [cod_ej=" + cod_ej + ", nom_ej=" + nom_ej + ", descrip=" + descrip + ", dificultad="
+				+ dificultad + ", duracion=" + duracion + "]";
+	}
+	
 }
