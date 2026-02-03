@@ -28,9 +28,7 @@ public class Main {
 		if (!fich2.exists()) {
 			fillData(fich2);
 			saveDataJugadores(fich1);
-
 		}
-
 		do {
 			opc = menu();
 			switch (opc) {
@@ -80,6 +78,7 @@ public class Main {
 				// Opcionales si nos vemos bn de tiempo.
 				case 9:
 					traspasoJugador();
+					comprobarEquiposMinJugEnt(fich1, fich2);
 					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
 					// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
 					// guardara la info para que se traspase.
@@ -195,7 +194,6 @@ public class Main {
 		int numEntrenadores = 0;
 		int[] datos = null;
 
-		// 1. Cargar todos los códigos de equipo en el mapa
 		if (!fich2.exists()) {
 			System.out.println("El fichero de equipos no existe.");
 			continuar = false;
@@ -217,13 +215,12 @@ public class Main {
 					try {
 						ois.close();
 					} catch (IOException e) {
-						// Ignorar error al cerrar
+						System.err.println("Error al cerrar el flujo: " + e.getMessage());
 					}
 				}
 			}
 		}
 
-		// 2. Recorrer staffs y contar si todo ha ido bien
 		if (continuar) {
 			if (!fich1.exists()) {
 				System.out.println("El fichero de staffs no existe.");
@@ -254,14 +251,13 @@ public class Main {
 						try {
 							ois.close();
 						} catch (IOException e) {
-							// Ignorar error al cerrar
+							System.err.println("Error al cerrar el flujo: " + e.getMessage());
 						}
 					}
 				}
 			}
 		}
 
-		// 3. Verificar y mostrar resultados
 		if (continuar) {
 			System.out.println("\n--- Informe de validación de Equipos ---");
 			for (String codEquipo : conteoEquipos.keySet()) {

@@ -2,7 +2,7 @@ package clases;
 
 import java.io.Serializable;
 
-public class Ejercicio implements Serializable {
+public class Ejercicio implements Serializable {	
 	/**
 	 * 
 	 */
