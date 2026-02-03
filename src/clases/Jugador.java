@@ -63,7 +63,7 @@ public class Jugador extends Staff implements Comparable<Jugador> {
 
 	@Override
     public int compareTo(Jugador otro) {
-        return Integer.compare(this.puntos, otro.getPuntos());
+        return Integer.compare(otro.getPuntos(), this.puntos);
     }
 
 }

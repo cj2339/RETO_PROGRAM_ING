@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import clases.*;
@@ -32,82 +33,123 @@ public class Main {
 		do {
 			opc = menu();
 			switch (opc) {
-				case 1:
-					aniadirJugador(fich1);
-					// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
-					// seteando. Se pediran todos los datos y se guardaran al final.
-					break;
-				case 2:
-					aniadirEntrenador(fich1, fich2);
-					// El codigo se autogenerara (Ejemplo: ENT - 001) los demas datos NO se iran
-					// seteando. Se pediran todos los datos y se guardaran al final.
-					break;
-				case 3:
-					aniadirEntrenamiento(fich1);
-					// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
-					// añada, advertiremos de que el formato del codigo deberan de ser minimo
-					// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
-					// los datos y se guardaran al final.
-					break;
-				case 4:
-					editarEdad(fich1);
-					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-					// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
-					// Se comprobara que el codigo que ha introducido existe.
-					break;
-				case 5:
-					eliminarJugador(fich1);
-					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-					// codigos. Se comprobara que el jugador exista para poder eliminarlo.
-					break;
-				case 6:
-					infoEquipo();
-					// Se mostrara la info de un equipo.
-					break;
-				case 7:
-					clasificacion();
-					// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
-					// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
-					// un equipo.
-					break;
-				case 8:
-					mostrarMasAntiguo();
-					mostrarStaffs(fich1);
-					// muestra el jugador que mas años haya estado en un equipo.
-					break;
+			case 1:
+				aniadirJugador(fich1);
+				// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
+				// seteando. Se pediran todos los datos y se guardaran al final.
+				break;
+			case 2:
+				aniadirEntrenador(fich1, fich2);
+				// El codigo se autogenerara (Ejemplo: ENT - 001) los demas datos NO se iran
+				// seteando. Se pediran todos los datos y se guardaran al final.
+				break;
+			case 3:
+				aniadirEntrenamiento(fich1);
+				// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
+				// añada, advertiremos de que el formato del codigo deberan de ser minimo
+				// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
+				// los datos y se guardaran al final.
+				break;
+			case 4:
+				editarEdad(fich1);
+				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+				// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
+				// Se comprobara que el codigo que ha introducido existe.
+				break;
+			case 5:
+				eliminarJugador(fich1);
+				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+				// codigos. Se comprobara que el jugador exista para poder eliminarlo.
+				break;
+			case 6:
+				infoEquipo();
+				// Se mostrara la info de un equipo.
+				break;
+			case 7:
+				clasificacion();
+				// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
+				// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
+				// un equipo.
+				break;
+			case 8:
+				mostrarMasAntiguo();
+				mostrarStaffs(fich1);
+				// muestra el jugador que mas años haya estado en un equipo.
+				break;
 				// Opcionales si nos vemos bn de tiempo.
-				case 9:
-					traspasoJugador();
-					comprobarEquiposMinJugEnt(fich1, fich2);
-					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-					// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
-					// guardara la info para que se traspase.
-					break;
-				case 10:
-					mostrarJugadoresPos(fich1);
-					// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
-					// este en el enum. Se mostraran los juadores de dicha posicion
-					break;
-				case 11:
-					jugadoresPorPuntos();
-					// Se mostrara la lista de jugadores ordenados por los puntos.
-					mostrarEntrenadores(fich1);
-					break;
-				case 12:
-					eliminarEntrenador(fich1);
-					break;
-				case 13:
-					System.out.println("Agurrr");
-					break;
+			case 9:
+				traspasoJugador();
+				comprobarEquiposMinJugEnt(fich1, fich2);
+				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+				// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
+				// guardara la info para que se traspase.
+				break;
+			case 10:
+				mostrarJugadoresPos(fich1);
+				// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
+				// este en el enum. Se mostraran los juadores de dicha posicion
+				break;
+			case 11:
+				jugadoresPorPuntos(fich1);
+				// Se mostrara la lista de jugadores ordenados por los puntos.
+				mostrarEntrenadores(fich1);
+				break;
+			case 12:
+				eliminarEntrenador(fich1);
+				break;
+			case 13:
+				System.out.println("Agurrr");
+				break;
 
 			}
 
 		} while (opc != 13);
 	}
 
-	private static void jugadoresPorPuntos() {
 
+	public static void jugadoresPorPuntos(File fich1) {
+		ArrayList<Jugador> jugadores = new ArrayList<>();
+		ObjectInputStream ois = null;
+		boolean finArchivo = false;
+
+		if (!fich1.exists()) {
+			System.out.println("No hay jugadores registrados.");
+		}else {
+
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich1));
+				while (!finArchivo) {
+					try {
+						Staff st = (Staff) ois.readObject();
+						if (st instanceof Jugador) {
+							jugadores.add((Jugador) st);
+						}
+					} catch (EOFException e) {
+						finArchivo = true;
+					}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error al leer el fichero: " + e.getMessage());
+			} finally {
+				try {
+					if (ois != null) ois.close();
+				} catch (IOException e) {}
+			}
+
+			if (jugadores.isEmpty()) {
+				System.out.println("No hay jugadores para mostrar.");
+			}
+
+			Collections.sort(jugadores);
+			System.out.println("\n--- JUGADORES ORDENADOS POR PUNTOS ---");
+			for (Jugador j : jugadores) {
+				j.visualizar();
+				System.out.println("-----------------------------");
+			}
+		}
 	}
+
+
 
 	private static void mostrarJugadoresPos(File fich1) {
 		ObjectInputStream ois = null;
