@@ -187,6 +187,7 @@ public class Main {
 		int contCoincidencias = 0;
 		boolean encontradoCodigo = false;
 		boolean finArchivo = false;
+		boolean esElBuscado;
 		ObjectInputStream ois = null;
 		ObjectOutputStream oos = null;
 		File fichTemp = new File("Temp.dat");
@@ -245,7 +246,7 @@ public class Main {
 					while (!finArchivo) {
 						try {
 							st = (Staff) ois.readObject();
-							boolean esElBuscado = false;
+							esElBuscado = false;
 							if (st instanceof Entrenador) {
 								if (st.getCod_s().equalsIgnoreCase(codigo)) {
 									esElBuscado = true;
