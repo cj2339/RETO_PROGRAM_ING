@@ -72,14 +72,12 @@ public class Main {
 				// un equipo.
 				break;
 			case 8:
-				mostrarMasAntiguo();
 				mostrarStaffs(fich1);
 				// muestra el jugador que mas años haya estado en un equipo.
 				break;
 				// Opcionales si nos vemos bn de tiempo.
 			case 9:
 				traspasoJugador();
-				comprobarEquiposMinJugEnt(fich1, fich2);
 				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
 				// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
 				// guardara la info para que se traspase.
@@ -92,7 +90,6 @@ public class Main {
 			case 11:
 				jugadoresPorPuntos(fich1);
 				// Se mostrara la lista de jugadores ordenados por los puntos.
-				mostrarEntrenadores(fich1);
 				break;
 			case 12:
 				eliminarEntrenador(fich1);
@@ -643,23 +640,22 @@ public class Main {
 	}
 
 	private static void mostrarEntrenadores(File fich1) {
-		ObjectInputStream ois = null;
 		boolean finArchivo = false;
-		try {
-			ois = new ObjectInputStream(new FileInputStream(fich1));
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fich1))){
 			while (!finArchivo) {
 				Staff staff = (Staff) ois.readObject();
 				if (staff instanceof Entrenador) {
 					staff.visualizar();
 				}
 			}
-			ois.close();
 		} catch (EOFException e) {
 			finArchivo = true;
 		} catch (IOException | ClassNotFoundException e) {
 			System.err.println("Error al leer equipos: " + e.getMessage());
 		}
 	}
+
+
 
 	private static void editarEdad(File fich1) {
 		String codigo = existeJugador(fich1);
