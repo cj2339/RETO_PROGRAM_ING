@@ -58,7 +58,7 @@ public class Main {
 					// Se comprobara que el codigo que ha introducido existe.
 					break;
 				case 5:
-					eliminarJugador();
+					eliminarJugador(fich1);
 					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
 					// codigos. Se comprobara que el jugador exista para poder eliminarlo.
 					break;
@@ -178,9 +178,49 @@ public class Main {
 
 	}
 
-	private static void eliminarJugador() {
+	private static void eliminarJugador(File fich1) {
+	    String codigoJugadorAEliminar = existeJugador(fich1);
+	    boolean jugadorEliminado = false;
+	    String mensaje = "Operación cancelada o jugador no encontrado.";
+        boolean finArchivo = false;
 
+	    if (!codigoJugadorAEliminar.equals("-1")) {
+	        ArrayList<Staff> staffsActualizados = new ArrayList<>();
+
+	        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fich1))) {
+	            while (!finArchivo) {
+	                try {
+	                    Staff sf = (Staff) ois.readObject();
+	                    // Si coincide el código y es un jugador, lo marcamos para eliminar (no lo añadimos a la lista)
+	                    if (sf instanceof Jugador && sf.getCod_s().equalsIgnoreCase(codigoJugadorAEliminar)) {
+	                        jugadorEliminado = true;
+	                        mensaje = "Jugador " + codigoJugadorAEliminar + " eliminado correctamente.";
+	                    } else {
+	                        // El resto de personal se mantiene en la lista
+	                        staffsActualizados.add(sf);
+	                    }
+	                } catch (EOFException e) {
+	                    finArchivo = true;
+	                }
+	            }
+	        } catch (IOException | ClassNotFoundException e) {
+	            mensaje = "Error al leer el fichero de staffs: " + e.getMessage();
+	        }
+
+	        if (jugadorEliminado) {
+	            // Reescribimos el fichero Staffs.dat con la lista que ya no contiene al jugador borrado
+	            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fich1))) {
+	                for (Staff sf : staffsActualizados) {
+	                    oos.writeObject(sf);
+	                }
+	            } catch (IOException e) {
+	                mensaje = "Error al reescribir el fichero de staffs: " + e.getMessage();
+	            }
+	        }
+	    }
+	    System.out.println(mensaje);
 	}
+
 
 	public static void comprobarEquiposMinJugEnt(File fich1, File fich2) {
 		HashMap<String, int[]> conteoEquipos = new HashMap<>(); // [0] = Jugadores, [1] = Entrenadores
@@ -408,10 +448,10 @@ public class Main {
 					while (!finArchivo) {
 						try {
 							Staff sf = (Staff) ois.readObject();
-							if (sf.getCod_e().equalsIgnoreCase(codigo) && sf instanceof Jugador) {
-								sf.setEdad(nuevaEdad);
-								encontrado = true;
-								mensaje = "Edad actualizada correctamente a " + nuevaEdad + " años.";
+							if (sf.getCod_s().equalsIgnoreCase(codigo) && sf instanceof Jugador) {
+							    sf.setEdad(nuevaEdad);
+							    encontrado = true;
+							    mensaje = "Edad actualizada correctamente a " + nuevaEdad + " años.";
 							}
 							jugadores.add((Staff) sf);
 						} catch (EOFException e) {
@@ -863,7 +903,7 @@ public class Main {
 			// --- Equipo: MOR - 1 ---
 			oos.writeObject(new Jugador("JUG - " + i++, "Juan Pérez", 25, LocalDate.of(2020, 5, 10), "España", 2500,
 					"MOR - 1", 150, POSICION.BASE));
-			oos.writeObject(new Jugador("JUG - " + i++, "Luka Modric", 28, LocalDate.of(2019, 8, 15), "Croacia", 3000,
+			oos.writeObject(new Jugador("JUG - " + i++, "Luka Modric", 28, LocalDate.of(2019, 8, 15), "Croacia", 3000,//desde cuándo modric juega al basket jajajaja
 					"MOR - 1", 200, POSICION.ALERO));
 			oos.writeObject(new Jugador("JUG - " + i++, "Marc Gasol", 32, LocalDate.of(2021, 1, 20), "España", 4500,
 					"MOR - 1", 300, POSICION.PIVOT));
