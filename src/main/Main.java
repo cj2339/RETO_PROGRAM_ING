@@ -3,7 +3,7 @@ package main;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class Main {
 					// Se comprobara que el codigo que ha introducido existe.
 					break;
 				case 5:
-					eliminarJugador();
+					eliminarJugador(fich1);
 					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
 					// codigos. Se comprobara que el jugador exista para poder eliminarlo.
 					break;
@@ -94,12 +94,15 @@ public class Main {
 					mostrarEntrenadores(fich1);
 					break;
 				case 12:
+					eliminarEntrenador(fich1);
+					break;
+				case 13:
 					System.out.println("Agurrr");
 					break;
 
 			}
 
-		} while (opc != 12);
+		} while (opc != 13);
 	}
 
 	private static void jugadoresPorPuntos() {
@@ -177,8 +180,239 @@ public class Main {
 
 	}
 
-	private static void eliminarJugador() {
+	public static void eliminarEntrenador(File fich1) {
+		String nombre = "";
+		String codigo = "";
+		String codigoCandidato = "";
+		int contCoincidencias = 0;
+		boolean encontradoCodigo = false;
+		boolean finArchivo = false;
+		ObjectInputStream ois = null;
+		ObjectOutputStream oos = null;
+		File fichTemp = new File("Temp.dat");
+		Staff st = null;
+		Entrenador ent = null;
 
+		if (fich1.exists()) {
+			System.out.println("Introduce el nombre del entrenador a eliminar: ");
+			nombre = Utilidades.introducirCadena();
+
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich1));
+				while (!finArchivo) {
+					try {
+						st = (Staff) ois.readObject();
+						if (st instanceof Entrenador) {
+							ent = (Entrenador) st;
+							if (ent.getNom_s().equalsIgnoreCase(nombre)) {
+								ent.visualizar();
+								contCoincidencias++;
+								codigoCandidato = ent.getCod_s();
+							}
+						}
+					} catch (EOFException e) {
+						finArchivo = true;
+					}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error al leer el fichero: " + e.getMessage());
+			} finally {
+				if (ois != null) {
+					try {
+						ois.close();
+					} catch (IOException e) {
+						System.err.println("Error al cerrar flujo: " + e.getMessage());
+					}
+				}
+			}
+
+			if (contCoincidencias > 0) {
+				if (contCoincidencias == 1) {
+					System.out.println("Se ha encontrado un único entrenador. Procediendo a eliminarlo...");
+					codigo = codigoCandidato;
+				} else {
+					System.out.println("Se han encontrado " + contCoincidencias + " entrenadores con ese nombre.");
+					System.out.println("Introduce el codigo del entrenador que quieres eliminar: ");
+					codigo = Utilidades.introducirCadena();
+				}
+
+				finArchivo = false;
+
+				try {
+					ois = new ObjectInputStream(new FileInputStream(fich1));
+					oos = new ObjectOutputStream(new FileOutputStream(fichTemp));
+
+					while (!finArchivo) {
+						try {
+							st = (Staff) ois.readObject();
+							boolean esElBuscado = false;
+							if (st instanceof Entrenador) {
+								if (st.getCod_s().equalsIgnoreCase(codigo)) {
+									esElBuscado = true;
+									encontradoCodigo = true;
+								}
+							}
+
+							if (!esElBuscado) {
+								oos.writeObject(st);
+							}
+
+						} catch (EOFException e) {
+							finArchivo = true;
+						}
+					}
+				} catch (IOException | ClassNotFoundException e) {
+					System.err.println("Error durante el proceso de eliminación: " + e.getMessage());
+				} finally {
+					if (oos != null) {
+						try {
+							oos.close();
+						} catch (IOException e) {
+							System.err.println("Error al cerrar flujo de salida: " + e.getMessage());
+						}
+					}
+					if (ois != null) {
+						try {
+							ois.close();
+						} catch (IOException e) {
+							System.err.println("Error al cerrar flujo de entrada: " + e.getMessage());
+						}
+					}
+				}
+
+				if (encontradoCodigo) {
+					if (fich1.delete()) {
+						if (fichTemp.renameTo(fich1)) {
+							System.out.println("Entrenador eliminado correctamente.");
+						} else {
+							System.out.println("Error al renombrar el fichero temporal.");
+						}
+					} else {
+						System.out.println("Error al borrar el fichero original.");
+					}
+				} else {
+					fichTemp.delete();
+					System.out.println("No se encontró ningún entrenador con ese código.");
+				}
+
+			} else {
+				System.out.println("No se ha encontrado ningún entrenador con ese nombre.");
+			}
+		} else {
+			System.out.println("El fichero no existe.");
+		}
+	}
+
+	private static void eliminarJugador(File fich1) {
+		String nombre = "";
+		String codigo = "";
+		String resp = "";
+		boolean encontradoNombre = false;
+		boolean encontradoCodigo = false;
+		boolean finArchivo = false;
+		boolean error = false;
+		ObjectInputStream ois = null;
+		ObjectOutputStream oos = null;
+		ArrayList<Staff> listaStaff = new ArrayList<>();
+		Staff st = null;
+		Jugador j = null;
+		int i = 0;
+		int k = 0;
+
+		if (!fich1.exists()) {
+			System.out.println("No hay jugadores registrados.");
+		} else {
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich1));
+				while (!finArchivo) {
+					try {
+						st = (Staff) ois.readObject();
+						listaStaff.add(st);
+					} catch (EOFException e) {
+						finArchivo = true;
+					}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error al leer el fichero: " + e.getMessage());
+				error = true;
+			} finally {
+				if (ois != null) {
+					try {
+						ois.close();
+					} catch (IOException e) {
+						System.err.println("Error al cerrar flujo: " + e.getMessage());
+					}
+				}
+			}
+
+			if (!error && !listaStaff.isEmpty()) {
+				System.out.println("Introduce el nombre del jugador a eliminar: ");
+				nombre = Utilidades.introducirCadena();
+
+				System.out.println("--- Jugadores con nombre: " + nombre + " ---");
+				while (i < listaStaff.size()) {
+					st = listaStaff.get(i);
+					if (st instanceof Jugador) {
+						j = (Jugador) st;
+						if (j.getNom_s().equalsIgnoreCase(nombre)) {
+							j.visualizar();
+							encontradoNombre = true;
+						}
+					}
+					i++;
+				}
+
+				if (encontradoNombre) {
+					System.out.println("Introduce el codigo del jugador que quieres eliminar: ");
+					codigo = Utilidades.introducirCadena();
+
+					i = 0;
+					while (i < listaStaff.size() && !encontradoCodigo) {
+						st = listaStaff.get(i);
+						if (st instanceof Jugador) {
+							if (st.getCod_s().equalsIgnoreCase(codigo)) {
+								encontradoCodigo = true;
+							}
+						}
+						if (!encontradoCodigo) {
+							i++;
+						}
+					}
+
+					if (encontradoCodigo) {
+						System.out.println("¿Estás seguro de eliminar el jugador " + codigo + "? (S/N)");
+						resp = Utilidades.introducirCadena();
+
+						if (resp.equalsIgnoreCase("S")) {
+							listaStaff.remove(i);
+							try {
+								oos = new ObjectOutputStream(new FileOutputStream(fich1));
+								for (k = 0; k < listaStaff.size(); k++) {
+									oos.writeObject(listaStaff.get(k));
+								}
+								System.out.println("Jugador eliminado correctamente.");
+							} catch (IOException e) {
+								System.err.println("Error al guardar cambios: " + e.getMessage());
+							} finally {
+								if (oos != null) {
+									try {
+										oos.close();
+									} catch (IOException e) {
+										System.err.println("Error al cerrar flujo salida: " + e.getMessage());
+									}
+								}
+							}
+						} else {
+							System.out.println("Operación cancelada.");
+						}
+					} else {
+						System.out.println("No se encontró ningún jugador con el código: " + codigo);
+					}
+				} else {
+					System.out.println("No se encontró ningún jugador con el nombre: " + nombre);
+				}
+			}
+		}
 	}
 
 	public static void comprobarEquiposMinJugEnt(File fich1, File fich2) {
@@ -787,9 +1021,10 @@ public class Main {
 		System.out.println("9. Traspaso de jugador");
 		System.out.println("10. Mostrar todos los jugadores de una posicion");
 		System.out.println("11. Mostrar jugadores ordenados por puntos");
-		System.out.println("12. Salir");
+		System.out.println("12. Eliminar entrenador");
+		System.out.println("13. Salir");
 		System.out.println("¿Qué quieres hacer?");
-		ele = Utilidades.leerInt(1, 12);
+		ele = Utilidades.leerInt(1, 13);
 		return ele;
 	}
 
