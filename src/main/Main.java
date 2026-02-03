@@ -33,76 +33,75 @@ public class Main {
 		do {
 			opc = menu();
 			switch (opc) {
-			case 1:
-				aniadirJugador(fich1);
-				// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
-				// seteando. Se pediran todos los datos y se guardaran al final.
-				break;
-			case 2:
-				aniadirEntrenador(fich1, fich2);
-				// El codigo se autogenerara (Ejemplo: ENT - 001) los demas datos NO se iran
-				// seteando. Se pediran todos los datos y se guardaran al final.
-				break;
-			case 3:
-				aniadirEntrenamiento(fich1);
-				// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
-				// añada, advertiremos de que el formato del codigo deberan de ser minimo
-				// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
-				// los datos y se guardaran al final.
-				break;
-			case 4:
-				editarEdad(fich1);
-				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-				// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
-				// Se comprobara que el codigo que ha introducido existe.
-				break;
-			case 5:
-				eliminarJugador(fich1);
-				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-				// codigos. Se comprobara que el jugador exista para poder eliminarlo.
-				break;
-			case 6:
-				infoEquipo();
-				// Se mostrara la info de un equipo.
-				break;
-			case 7:
-				clasificacion();
-				// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
-				// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
-				// un equipo.
-				break;
-			case 8:
-				mostrarStaffs(fich1);
-				// muestra el jugador que mas años haya estado en un equipo.
-				break;
+				case 1:
+					aniadirJugador(fich1);
+					// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
+					// seteando. Se pediran todos los datos y se guardaran al final.
+					break;
+				case 2:
+					aniadirEntrenador(fich1, fich2);
+					// El codigo se autogenerara (Ejemplo: ENT - 001) los demas datos NO se iran
+					// seteando. Se pediran todos los datos y se guardaran al final.
+					break;
+				case 3:
+					aniadirEntrenamiento(fich1);
+					// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
+					// añada, advertiremos de que el formato del codigo deberan de ser minimo
+					// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
+					// los datos y se guardaran al final.
+					break;
+				case 4:
+					editarEdad(fich1);
+					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+					// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
+					// Se comprobara que el codigo que ha introducido existe.
+					break;
+				case 5:
+					eliminarJugador(fich1);
+					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+					// codigos. Se comprobara que el jugador exista para poder eliminarlo.
+					break;
+				case 6:
+					infoEquipo();
+					// Se mostrara la info de un equipo.
+					break;
+				case 7:
+					clasificacion();
+					// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
+					// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
+					// un equipo.
+					break;
+				case 8:
+					mostrarStaffs(fich1);
+					// muestra el jugador que mas años haya estado en un equipo.
+					break;
 				// Opcionales si nos vemos bn de tiempo.
-			case 9:
-				traspasoJugador();
-				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-				// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
-				// guardara la info para que se traspase.
-				break;
-			case 10:
-				mostrarJugadoresPos(fich1);
-				// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
-				// este en el enum. Se mostraran los juadores de dicha posicion
-				break;
-			case 11:
-				jugadoresPorPuntos(fich1);
-				// Se mostrara la lista de jugadores ordenados por los puntos.
-				break;
-			case 12:
-				eliminarEntrenador(fich1);
-				break;
-			case 13:
-				System.out.println("Agurrr");
-				break;
+				case 9:
+					traspasoJugador();
+					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+					// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
+					// guardara la info para que se traspase.
+					break;
+				case 10:
+					mostrarJugadoresPos(fich1);
+					// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
+					// este en el enum. Se mostraran los juadores de dicha posicion
+					break;
+				case 11:
+					jugadoresPorPuntos(fich1);
+					// Se mostrara la lista de jugadores ordenados por los puntos.
+					break;
+				case 12:
+					eliminarEntrenador(fich1);
+					break;
+				case 13:
+					System.out.println("Agurrr");
+					break;
 
 			}
 
 		} while (opc != 13);
 	}
-
 
 	public static void jugadoresPorPuntos(File fich1) {
 		ArrayList<Jugador> jugadores = new ArrayList<>();
@@ -111,7 +110,7 @@ public class Main {
 
 		if (!fich1.exists()) {
 			System.out.println("No hay jugadores registrados.");
-		}else {
+		} else {
 
 			try {
 				ois = new ObjectInputStream(new FileInputStream(fich1));
@@ -129,8 +128,10 @@ public class Main {
 				System.err.println("Error al leer el fichero: " + e.getMessage());
 			} finally {
 				try {
-					if (ois != null) ois.close();
-				} catch (IOException e) {}
+					if (ois != null)
+						ois.close();
+				} catch (IOException e) {
+				}
 			}
 
 			if (jugadores.isEmpty()) {
@@ -145,8 +146,6 @@ public class Main {
 			}
 		}
 	}
-
-
 
 	private static void mostrarJugadoresPos(File fich1) {
 		ObjectInputStream ois = null;
@@ -346,35 +345,40 @@ public class Main {
 	private static void eliminarJugador(File fich1) {
 		String nombre = "";
 		String codigo = "";
-		String resp = "";
-		boolean encontradoNombre = false;
+		String codigoCandidato = "";
+		int contCoincidencias = 0;
 		boolean encontradoCodigo = false;
 		boolean finArchivo = false;
-		boolean error = false;
+		boolean esElBuscado;
 		ObjectInputStream ois = null;
 		ObjectOutputStream oos = null;
-		ArrayList<Staff> listaStaff = new ArrayList<>();
+		File fichTemp = new File("Temp.dat");
 		Staff st = null;
-		Jugador j = null;
-		int i = 0;
-		int k = 0;
+		Jugador jug = null;
 
-		if (!fich1.exists()) {
-			System.out.println("No hay jugadores registrados.");
-		} else {
+		if (fich1.exists()) {
+			System.out.println("Introduce el nombre del jugador a eliminar: ");
+			nombre = Utilidades.introducirCadena();
+
 			try {
 				ois = new ObjectInputStream(new FileInputStream(fich1));
 				while (!finArchivo) {
 					try {
 						st = (Staff) ois.readObject();
-						listaStaff.add(st);
+						if (st instanceof Jugador) {
+							jug = (Jugador) st;
+							if (jug.getNom_s().equalsIgnoreCase(nombre)) {
+								jug.visualizar();
+								contCoincidencias++;
+								codigoCandidato = jug.getCod_s();
+							}
+						}
 					} catch (EOFException e) {
 						finArchivo = true;
 					}
 				}
 			} catch (IOException | ClassNotFoundException e) {
 				System.err.println("Error al leer el fichero: " + e.getMessage());
-				error = true;
 			} finally {
 				if (ois != null) {
 					try {
@@ -385,73 +389,80 @@ public class Main {
 				}
 			}
 
-			if (!error && !listaStaff.isEmpty()) {
-				System.out.println("Introduce el nombre del jugador a eliminar: ");
-				nombre = Utilidades.introducirCadena();
-
-				System.out.println("--- Jugadores con nombre: " + nombre + " ---");
-				while (i < listaStaff.size()) {
-					st = listaStaff.get(i);
-					if (st instanceof Jugador) {
-						j = (Jugador) st;
-						if (j.getNom_s().equalsIgnoreCase(nombre)) {
-							j.visualizar();
-							encontradoNombre = true;
-						}
-					}
-					i++;
-				}
-
-				if (encontradoNombre) {
+			if (contCoincidencias > 0) {
+				if (contCoincidencias == 1) {
+					System.out.println("Se ha encontrado un único jugador. Procediendo a eliminarlo...");
+					codigo = codigoCandidato;
+				} else {
+					System.out.println("Se han encontrado " + contCoincidencias + " jugadores con ese nombre.");
 					System.out.println("Introduce el codigo del jugador que quieres eliminar: ");
 					codigo = Utilidades.introducirCadena();
+				}
 
-					i = 0;
-					while (i < listaStaff.size() && !encontradoCodigo) {
-						st = listaStaff.get(i);
-						if (st instanceof Jugador) {
-							if (st.getCod_s().equalsIgnoreCase(codigo)) {
-								encontradoCodigo = true;
+				finArchivo = false;
+
+				try {
+					ois = new ObjectInputStream(new FileInputStream(fich1));
+					oos = new ObjectOutputStream(new FileOutputStream(fichTemp));
+
+					while (!finArchivo) {
+						try {
+							st = (Staff) ois.readObject();
+							esElBuscado = false;
+							if (st instanceof Jugador) {
+								if (st.getCod_s().equalsIgnoreCase(codigo)) {
+									esElBuscado = true;
+									encontradoCodigo = true;
+								}
 							}
-						}
-						if (!encontradoCodigo) {
-							i++;
+
+							if (!esElBuscado) {
+								oos.writeObject(st);
+							}
+
+						} catch (EOFException e) {
+							finArchivo = true;
 						}
 					}
+				} catch (IOException | ClassNotFoundException e) {
+					System.err.println("Error durante el proceso de eliminación: " + e.getMessage());
+				} finally {
+					if (oos != null) {
+						try {
+							oos.close();
+						} catch (IOException e) {
+							System.err.println("Error al cerrar flujo de salida: " + e.getMessage());
+						}
+					}
+					if (ois != null) {
+						try {
+							ois.close();
+						} catch (IOException e) {
+							System.err.println("Error al cerrar flujo de entrada: " + e.getMessage());
+						}
+					}
+				}
 
-					if (encontradoCodigo) {
-						System.out.println("¿Estás seguro de eliminar el jugador " + codigo + "? (S/N)");
-						resp = Utilidades.introducirCadena();
-
-						if (resp.equalsIgnoreCase("S")) {
-							listaStaff.remove(i);
-							try {
-								oos = new ObjectOutputStream(new FileOutputStream(fich1));
-								for (k = 0; k < listaStaff.size(); k++) {
-									oos.writeObject(listaStaff.get(k));
-								}
-								System.out.println("Jugador eliminado correctamente.");
-							} catch (IOException e) {
-								System.err.println("Error al guardar cambios: " + e.getMessage());
-							} finally {
-								if (oos != null) {
-									try {
-										oos.close();
-									} catch (IOException e) {
-										System.err.println("Error al cerrar flujo salida: " + e.getMessage());
-									}
-								}
-							}
+				if (encontradoCodigo) {
+					if (fich1.delete()) {
+						if (fichTemp.renameTo(fich1)) {
+							System.out.println("Jugador eliminado correctamente.");
 						} else {
-							System.out.println("Operación cancelada.");
+							System.out.println("Error al renombrar el fichero temporal.");
 						}
 					} else {
-						System.out.println("No se encontró ningún jugador con el código: " + codigo);
+						System.out.println("Error al borrar el fichero original.");
 					}
 				} else {
-					System.out.println("No se encontró ningún jugador con el nombre: " + nombre);
+					fichTemp.delete();
+					System.out.println("No se encontró ningún jugador con ese código.");
 				}
+
+			} else {
+				System.out.println("No se ha encontrado ningún jugador con ese nombre.");
 			}
+		} else {
+			System.out.println("El fichero no existe.");
 		}
 	}
 
@@ -641,7 +652,7 @@ public class Main {
 
 	private static void mostrarEntrenadores(File fich1) {
 		boolean finArchivo = false;
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fich1))){
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fich1))) {
 			while (!finArchivo) {
 				Staff staff = (Staff) ois.readObject();
 				if (staff instanceof Entrenador) {
@@ -654,8 +665,6 @@ public class Main {
 			System.err.println("Error al leer equipos: " + e.getMessage());
 		}
 	}
-
-
 
 	private static void editarEdad(File fich1) {
 		String codigo = existeJugador(fich1);
