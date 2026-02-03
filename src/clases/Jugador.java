@@ -2,7 +2,7 @@ package clases;
 
 import java.time.LocalDate;
 
-public class Jugador extends Staff {
+public class Jugador extends Staff implements Comparable<Jugador> {
 
 	/**
 	 * 
@@ -60,5 +60,10 @@ public class Jugador extends Staff {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+    public int compareTo(Jugador otro) {
+        return Integer.compare(this.puntos, otro.getPuntos());
+    }
 
 }
