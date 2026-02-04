@@ -1321,7 +1321,7 @@ public class Main {
 		System.out.println("5. Eliminar jugador");
 		System.out.println("6. Mostrar info equipo");
 		System.out.println("7. Mostrar clasificacion");
-		System.out.println("8. Mostrar jugador con mas tiempo en un equipo");
+		System.out.println("8. Mostrar Staffs");
 		System.out.println("9. Traspaso de jugador");
 		System.out.println("10. Mostrar todos los jugadores de una posicion");
 		System.out.println("11. Mostrar jugadores ordenados por puntos");
@@ -1622,8 +1622,8 @@ public class Main {
 		try {
 			ois = new ObjectInputStream(new FileInputStream(fich1));
 			while (!finArchivo) {
-				Jugador jugador = (Jugador) ois.readObject();
-				jugador.visualizar();
+				Staff st = (Staff) ois.readObject();
+				st.visualizar();
 			}
 
 			ois.close();
