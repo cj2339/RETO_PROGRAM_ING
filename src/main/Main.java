@@ -247,7 +247,7 @@ public class Main {
 			System.out.println("\n--- EQUIPOS ORDENADOS POR PUNTOS ---");
 			for (Equipo e : equipos) {
 				e.mostrarInfo();
-				System.out.println("-----------------------------");
+				System.out.println("------------------------------");
 			}
 		}
 	
