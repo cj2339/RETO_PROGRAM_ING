@@ -1061,11 +1061,11 @@ public class Main {
 
 					try {
 						if (entrenadoresEnEquipo >= 3 && !error) {
-							throw new MaxEntException();
+							throw new MaxEntException("El equipo " + cod_e
+									+ " ya tiene 3 entrenadores. Debe eliminar uno antes de añadir otro.");
 						}
 					} catch (MaxEntException e) {
-						System.out.println("ERROR: El equipo " + cod_e
-								+ " ya tiene 3 entrenadores. Debe eliminar uno antes de añadir otro.");
+						System.out.println(e.getMessage());
 						error = true;
 					}
 				}
@@ -1191,10 +1191,10 @@ public class Main {
 
 		try {
 			if (jugadoresEnEquipo >= 15) {
-				throw new MaxJugException();
+				throw new MaxJugException("El equipo " + cod_e + " ya tiene 15 jugadores. No se pueden añadir más.");
 			}
 		} catch (MaxJugException e) {
-			System.out.println("ERROR: El equipo " + cod_e + " ya tiene 15 jugadores. No se pueden añadir más.");
+			System.out.println(e.getMessage());
 			continuar = false;
 		}
 
