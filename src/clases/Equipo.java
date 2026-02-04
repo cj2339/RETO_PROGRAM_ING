@@ -73,3 +73,4 @@ public class Equipo implements Serializable, Comparable<Equipo>{
     }
 
 }
+

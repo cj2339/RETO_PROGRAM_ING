@@ -214,7 +214,7 @@ public class Main {
 		ArrayList<Equipo> equipos = new ArrayList<>();
 		ObjectInputStream ois = null;
 		boolean finArchivo = false;
-
+		
 		if (!fich2.exists()) {
 			System.out.println("No hay equipos registrados.");
 		}else {
