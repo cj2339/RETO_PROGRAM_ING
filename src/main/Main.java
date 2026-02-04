@@ -77,7 +77,7 @@ public class Main {
 					break;
 				// Opcionales si nos vemos bn de tiempo.
 				case 9:
-					traspasoJugador();
+					traspasoJugador(fich1, fich2);
 					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
 					// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
 					// guardara la info para que se traspase.
@@ -202,8 +202,219 @@ public class Main {
 
 	}
 
-	private static void traspasoJugador() {
+	private static void traspasoJugador(File fich1, File fich2) {
+		String nombre = "";
+		String codigo = "";
+		String codigoCandidato = "";
+		String nombreEquipo = "";
+		String codigoEquipoActual = "";
+		String nuevoCodigoEquipo = "";
+		int contCoincidencias = 0;
+		boolean finArchivo = false;
+		boolean jugadorEncontrado = false;
+		boolean equipoValido = false;
+		boolean equipoEncontrado = false;
+		ObjectInputStream ois = null;
+		ObjectOutputStream oos = null;
+		ArrayList<Staff> listaStaff = new ArrayList<>();
+		Staff st = null;
+		Jugador jug = null;
+		Equipo eq = null;
+		int i = 0;
 
+		if (!fich1.exists()) {
+			System.out.println("No hay jugadores registrados.");
+		} else {
+			System.out.println("Introduce el nombre del jugador que quieras traspasar: ");
+			nombre = Utilidades.introducirCadena();
+
+			// Buscar jugadores con ese nombre
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich1));
+				while (!finArchivo) {
+					try {
+						st = (Staff) ois.readObject();
+						if (st instanceof Jugador) {
+							jug = (Jugador) st;
+							if (jug.getNom_s().equalsIgnoreCase(nombre)) {
+								jug.visualizar();
+								System.out.println("-----------------------------");
+								contCoincidencias++;
+								codigoCandidato = jug.getCod_s();
+								codigoEquipoActual = jug.getCod_e();
+							}
+						}
+					} catch (EOFException e) {
+						finArchivo = true;
+					}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error al leer el fichero: " + e.getMessage());
+			} finally {
+				if (ois != null) {
+					try {
+						ois.close();
+					} catch (IOException e) {
+						System.err.println("Error al cerrar flujo: " + e.getMessage());
+					}
+				}
+			}
+
+			if (contCoincidencias > 0) {
+				// Determinar qué jugador traspasar
+				if (contCoincidencias == 1) {
+					System.out.println("Se ha encontrado un único jugador con ese nombre.");
+					codigo = codigoCandidato;
+					jugadorEncontrado = true;
+				} else {
+					System.out.println("Se han encontrado " + contCoincidencias + " jugadores con ese nombre.");
+					System.out.println("Introduce el codigo del jugador que quieres traspasar: ");
+					codigo = Utilidades.introducirCadena();
+
+					// Verificar que el código introducido existe
+					finArchivo = false;
+					try {
+						ois = new ObjectInputStream(new FileInputStream(fich1));
+						while (!finArchivo && !jugadorEncontrado) {
+							try {
+								st = (Staff) ois.readObject();
+								if (st instanceof Jugador) {
+									jug = (Jugador) st;
+									if (jug.getCod_s().equalsIgnoreCase(codigo)) {
+										jugadorEncontrado = true;
+										codigoEquipoActual = jug.getCod_e();
+									}
+								}
+							} catch (EOFException e) {
+								finArchivo = true;
+							}
+						}
+					} catch (IOException | ClassNotFoundException e) {
+						System.err.println("Error al leer el fichero: " + e.getMessage());
+					} finally {
+						if (ois != null) {
+							try {
+								ois.close();
+							} catch (IOException e) {
+								System.err.println("Error al cerrar flujo: " + e.getMessage());
+							}
+						}
+					}
+
+					if (!jugadorEncontrado) {
+						System.out.println("No se encontró ningún jugador con ese código.");
+					}
+				}
+
+				// Si tenemos un jugador válido, pedir el equipo de destino
+				while (jugadorEncontrado && !equipoValido) {
+					System.out.println("Introduce el nombre del equipo al que quieres traspasar al jugador: ");
+					nombreEquipo = Utilidades.introducirCadena();
+
+					// Buscar el equipo en el fichero de equipos
+					finArchivo = false;
+					equipoEncontrado = false;
+					nuevoCodigoEquipo = "";
+
+					if (!fich2.exists()) {
+						System.out.println("No hay equipos registrados.");
+						equipoValido = true; // Salir del bucle
+					} else {
+						try {
+							ois = new ObjectInputStream(new FileInputStream(fich2));
+							while (!finArchivo) {
+								try {
+									eq = (Equipo) ois.readObject();
+									if (eq.getNom_e().equalsIgnoreCase(nombreEquipo)) {
+										equipoEncontrado = true;
+										nuevoCodigoEquipo = eq.getCod_e();
+										finArchivo = true;
+									}
+								} catch (EOFException e) {
+									finArchivo = true;
+								}
+							}
+						} catch (IOException | ClassNotFoundException e) {
+							System.err.println("Error al leer el fichero de equipos: " + e.getMessage());
+						} finally {
+							if (ois != null) {
+								try {
+									ois.close();
+								} catch (IOException e) {
+									System.err.println("Error al cerrar flujo: " + e.getMessage());
+								}
+							}
+						}
+
+						if (!equipoEncontrado) {
+							System.out.println("ERROR: El equipo introducido no existe. Intentalo de nuevo.");
+						} else if (nuevoCodigoEquipo.equalsIgnoreCase(codigoEquipoActual)) {
+							System.out.println(
+									"ERROR: El jugador ya pertenece a ese equipo. Introduce un equipo diferente.");
+						} else {
+							equipoValido = true;
+						}
+					}
+				}
+
+				// Si todo es válido, realizar el traspaso
+				if (jugadorEncontrado && equipoValido && equipoEncontrado) {
+					finArchivo = false;
+					listaStaff.clear();
+
+					// Leer todos los staffs y modificar el jugador correspondiente
+					try {
+						ois = new ObjectInputStream(new FileInputStream(fich1));
+						while (!finArchivo) {
+							try {
+								st = (Staff) ois.readObject();
+								if (st instanceof Jugador) {
+									jug = (Jugador) st;
+									if (jug.getCod_s().equalsIgnoreCase(codigo)) {
+										jug.setCod_e(nuevoCodigoEquipo);
+									}
+								}
+								listaStaff.add(st);
+							} catch (EOFException e) {
+								finArchivo = true;
+							}
+						}
+					} catch (IOException | ClassNotFoundException e) {
+						System.err.println("Error al leer el fichero: " + e.getMessage());
+					} finally {
+						if (ois != null) {
+							try {
+								ois.close();
+							} catch (IOException e) {
+								System.err.println("Error al cerrar flujo: " + e.getMessage());
+							}
+						}
+					}
+
+					// Escribir todos los staffs de vuelta al fichero
+					try {
+						oos = new ObjectOutputStream(new FileOutputStream(fich1));
+						for (i = 0; i < listaStaff.size(); i++) {
+							st = listaStaff.get(i);
+							oos.writeObject(st);
+						}
+						System.out.println("Traspaso realizado con éxito.");
+					} catch (IOException e) {
+						System.err.println("Error al guardar los cambios: " + e.getMessage());
+					} finally {
+						if (oos != null) {
+							try {
+								oos.close();
+							} catch (IOException e) {
+								System.err.println("Error al cerrar flujo de salida: " + e.getMessage());
+							}
+						}
+					}
+				}
+			} else {
+				System.out.println("No se ha encontrado ningún jugador con ese nombre.");
+			}
+		}
 	}
 
 	private static void clasificacion() {
@@ -214,10 +425,10 @@ public class Main {
 		ArrayList<Equipo> equipos = new ArrayList<>();
 		ObjectInputStream ois = null;
 		boolean finArchivo = false;
-		
+
 		if (!fich2.exists()) {
 			System.out.println("No hay equipos registrados.");
-		}else {
+		} else {
 
 			try {
 				ois = new ObjectInputStream(new FileInputStream(fich2));
@@ -235,8 +446,10 @@ public class Main {
 				System.err.println("Error al leer el fichero: " + e.getMessage());
 			} finally {
 				try {
-					if (ois != null) ois.close();
-				} catch (IOException e) {}
+					if (ois != null)
+						ois.close();
+				} catch (IOException e) {
+				}
 			}
 
 			if (equipos.isEmpty()) {
@@ -250,7 +463,7 @@ public class Main {
 				System.out.println("-----------------------------");
 			}
 		}
-	
+
 	}
 
 	public static void eliminarEntrenador(File fich1) {
@@ -703,7 +916,6 @@ public class Main {
 
 	private static void editarEdad(File fich1) {
 		String codigo = existeJugador(fich1);
-		boolean operacionExitosa = false;
 		String mensaje = "Operación cancelada o jugador no encontrado.";
 
 		if (!codigo.equals("-1")) {
@@ -737,7 +949,6 @@ public class Main {
 							for (Staff j : jugadores) {
 								oos.writeObject(j);
 							}
-							operacionExitosa = true;
 							mensaje = "Cambios guardados correctamente en el fichero.\n" + mensaje;
 						} catch (IOException e) {
 							mensaje = "Error al guardar los cambios: " + e.getMessage();
@@ -773,6 +984,11 @@ public class Main {
 		edad = Utilidades.leerInt(18, 80);
 		System.out.println("Introduce la fecha de entrada: ");
 		fecha = Utilidades.leerFechaAMD();
+		while ((edad - 16) < (2026 - fecha.getYear())) {
+			System.out.println("Error, La fecha de incorporación no puede ser anterior a los 16 años de edad.");
+			System.out.println("Introduce la fecha de incorporación:(A/M/D) ");
+			fecha = Utilidades.leerFechaAMD();
+		}
 		System.out.println("Introduce el pais: ");
 		pais = Utilidades.introducirCadena();
 		System.out.println("Introduce el sueldo: ");
@@ -925,12 +1141,17 @@ public class Main {
 		boolean finCount = false;
 		boolean continuar = true;
 
-		System.out.println("Introduce el nombre del Staff: ");
+		System.out.println("Introduce el nombre del Jugador: ");
 		nombre_s = Utilidades.introducirCadena();
 		System.out.println("Introduce la edad: ");
-		edad = Utilidades.leerInt();
+		edad = Utilidades.leerInt(16, 70);
 		System.out.println("Introduce la fecha de incorporación:(A/M/D) ");
 		fechaIncor = Utilidades.leerFechaAMD();
+		while ((edad - 16) < (2026 - fechaIncor.getYear())) {
+			System.out.println("Error, La fecha de incorporación no puede ser anterior a los 16 años de edad.");
+			System.out.println("Introduce la fecha de incorporación:(A/M/D) ");
+			fechaIncor = Utilidades.leerFechaAMD();
+		}
 		System.out.println("Introduce el pais: ");
 		pais = Utilidades.introducirCadena();
 		System.out.println("Introduce el sueldo: ");
@@ -1029,7 +1250,7 @@ public class Main {
 				}
 			} else {
 				try {
-					moos = new MyObjectOutputStream(new FileOutputStream(fich1, true)); // true para append
+					moos = new MyObjectOutputStream(new FileOutputStream(fich1, true));
 					moos.writeObject(j);
 					moos.close();
 					System.out.println("Jugador añadido correctamente.");
