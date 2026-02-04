@@ -49,7 +49,7 @@ public class Jugador extends Staff implements Comparable<Jugador> {
 		System.out.println("Fecha de incorporacion: " + getFechaIncor());
 		System.out.println("Pais: " + getPais());
 		System.out.println("Sueldo: " + getSueldo());
-		System.out.println("Codigo de entrenador: " + getCod_e());
+		System.out.println("Codigo de equioo: " + getCod_e());
 		System.out.println("Puntos: " + getPuntos());
 		System.out.println("Posicion: " + getPosicion());
 
