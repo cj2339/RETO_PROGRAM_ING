@@ -4,7 +4,11 @@ import java.io.FileWriter;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Equipo implements Serializable{
+public class Equipo implements Serializable, Comparable<Equipo>{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String cod_e;
 	private String nom_e;
 	private LocalDate fechaFundacion;
@@ -63,5 +67,9 @@ public class Equipo implements Serializable{
 		System.out.println("Cantico: " + this.cantico);
 
 	}
-	
+	@Override
+    public int compareTo(Equipo otro) {
+        return this.nom_e.compareToIgnoreCase(otro.nom_e);
+    }
+
 }

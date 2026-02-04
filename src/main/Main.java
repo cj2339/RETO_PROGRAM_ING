@@ -62,7 +62,7 @@ public class Main {
 					// codigos. Se comprobara que el jugador exista para poder eliminarlo.
 					break;
 				case 6:
-					infoEquipo();
+					infoEquipo(fich2);
 					// Se mostrara la info de un equipo.
 					break;
 				case 7:
@@ -206,16 +206,51 @@ public class Main {
 
 	}
 
-	private static void mostrarMasAntiguo() {
-
-	}
-
 	private static void clasificacion() {
 
 	}
 
-	private static void infoEquipo() {
+	private static void infoEquipo(File fich2) {
+		ArrayList<Equipo> equipos = new ArrayList<>();
+		ObjectInputStream ois = null;
+		boolean finArchivo = false;
 
+		if (!fich2.exists()) {
+			System.out.println("No hay equipos registrados.");
+		}else {
+
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich2));
+				while (!finArchivo) {
+					try {
+						Equipo eq = (Equipo) ois.readObject();
+						if (eq instanceof Equipo) {
+							equipos.add((Equipo) eq);
+						}
+					} catch (EOFException e) {
+						finArchivo = true;
+					}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error al leer el fichero: " + e.getMessage());
+			} finally {
+				try {
+					if (ois != null) ois.close();
+				} catch (IOException e) {}
+			}
+
+			if (equipos.isEmpty()) {
+				System.out.println("No hay equipos para mostrar.");
+			}
+
+			Collections.sort(equipos);
+			System.out.println("\n--- EQUIPOS ORDENADOS POR PUNTOS ---");
+			for (Equipo e : equipos) {
+				e.mostrarInfo();
+				System.out.println("-----------------------------");
+			}
+		}
+	
 	}
 
 	public static void eliminarEntrenador(File fich1) {
