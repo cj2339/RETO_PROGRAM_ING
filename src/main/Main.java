@@ -206,10 +206,6 @@ public class Main {
 
 	}
 
-	private static void mostrarMasAntiguo() {
-
-	}
-
 	private static void clasificacion() {
 
 	}
