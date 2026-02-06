@@ -1,6 +1,9 @@
 package clases;
 
-import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -12,10 +15,10 @@ public class Equipo implements Serializable, Comparable<Equipo> {
 	private String cod_e;
 	private String nom_e;
 	private LocalDate fechaFundacion;
-	private FileWriter cantico;
+	private String cantico;
 	private int totalPuntos;
 
-	public Equipo(String cod_e, String nom_e, LocalDate fechaFundacion, FileWriter cantico) {
+	public Equipo(String cod_e, String nom_e, LocalDate fechaFundacion, String cantico) {
 		this.cod_e = cod_e;
 		this.nom_e = nom_e;
 		this.fechaFundacion = fechaFundacion;
@@ -55,11 +58,11 @@ public class Equipo implements Serializable, Comparable<Equipo> {
 		this.fechaFundacion = fechaFundacion;
 	}
 
-	public FileWriter getCantico() {
+	public String getCantico() {
 		return cantico;
 	}
 
-	public void setCantico(FileWriter cantico) {
+	public void setCantico(String cantico) {
 		this.cantico = cantico;
 	}
 
@@ -75,8 +78,25 @@ public class Equipo implements Serializable, Comparable<Equipo> {
 		System.out.println("Codigo: " + this.cod_e);
 		System.out.println("Nombre: " + this.nom_e);
 		System.out.println("Fecha de fundacion: " + this.fechaFundacion);
-		System.out.println("Cantico: " + this.cantico);
-		System.out.println("Total Puntos: " + this.totalPuntos);
+
+	    if (this.cantico != null) {
+	        File f = new File(this.cantico);
+	        if (f.exists()) {
+	            System.out.print("Cantico: ");
+	            try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+	                String linea;
+	                while ((linea = br.readLine()) != null) {
+	                    System.out.println(linea);
+	                }
+	            } catch (IOException e) {
+	                System.out.println("Error al leer el cántico."); 
+	            }
+	        } else {
+	            System.out.println("Cantico: Fichero no encontrado (" + this.cantico + ")");
+	        }
+	    } else {
+	        System.out.println("Cantico: No asignado (null)");
+	    }
 	}
 
 	@Override

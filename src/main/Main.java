@@ -1299,7 +1299,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(150 + 200 + 300 + 120 + 450);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1315,7 +1315,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(80 + 500 + 600 + 350 + 210);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1331,7 +1331,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(190 + 175 + 310 + 240 + 160);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1347,7 +1347,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(130 + 180 + 140 + 150 + 170);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1363,7 +1363,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(220 + 160 + 110 + 130 + 250);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1379,7 +1379,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(200 + 150 + 160 + 140 + 280);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1395,7 +1395,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(140 + 130 + 180 + 150 + 160);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1411,7 +1411,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(250 + 180 + 170 + 160 + 210);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1427,7 +1427,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(140 + 150 + 90 + 190 + 160);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1443,13 +1443,13 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(180 + 140 + 100 + 90 + 250);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
 
 			// --- UCAM Murcia ---
-			nombre = "UCAM Murcia";
+			nombre = "UCAM Murcia"; 
 			cod = "UCA - 1";
 			fecha = LocalDate.of(1985, 1, 1);
 			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
@@ -1459,7 +1459,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(160 + 190 + 170 + 150 + 210);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1475,7 +1475,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(160 + 150 + 100 + 140 + 200);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1491,7 +1491,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(170 + 180 + 130 + 120 + 190);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1507,7 +1507,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(140 + 130 + 150 + 140 + 160);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1523,7 +1523,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(150 + 130 + 140 + 160 + 200);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
@@ -1539,7 +1539,7 @@ public class Main {
 				fw.write("¡Vamos, vamos " + nombre + "!");
 				fw.close();
 			}
-			eq = new Equipo(cod, nombre, fecha, null);
+			eq = new Equipo(cod, nombre, fecha, nombreArchivoCantico);
 			eq.setTotalPuntos(1600 + 150 + 1300 + 140 + 1200);
 			oos.writeObject(eq);
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
