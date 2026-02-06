@@ -58,7 +58,7 @@ public class Main {
 					// Se comprobara que el codigo que ha introducido existe.
 					break;
 				case 5:
-					eliminarJugador(fich1);
+					eliminarJugador(fich1, fich2);
 					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
 					// codigos. Se comprobara que el jugador exista para poder eliminarlo.
 					break;
@@ -595,7 +595,7 @@ public class Main {
 		}
 	}
 
-	private static void eliminarJugador(File fich1) {
+	private static void eliminarJugador(File fich1, File fich2) {
 		String nombre = "";
 		String codigo = "";
 		String codigoCandidato = "";
@@ -608,6 +608,8 @@ public class Main {
 		File fichTemp = new File("Temp.dat");
 		Staff st = null;
 		Jugador jug = null;
+		int puntosDeleted = 0;
+		String codEquipoDeleted = "";
 
 		if (fich1.exists()) {
 			System.out.println("Introduce el nombre del jugador a eliminar: ");
@@ -666,6 +668,9 @@ public class Main {
 								if (st.getCod_s().equalsIgnoreCase(codigo)) {
 									esElBuscado = true;
 									encontradoCodigo = true;
+									Jugador jDel = (Jugador) st;
+									puntosDeleted = jDel.getPuntos();
+									codEquipoDeleted = jDel.getCod_e();
 								}
 							}
 
@@ -697,9 +702,43 @@ public class Main {
 				}
 
 				if (encontradoCodigo) {
+
 					if (fich1.delete()) {
 						if (fichTemp.renameTo(fich1)) {
 							System.out.println("Jugador eliminado correctamente.");
+
+							// Actualizar puntos del equipo (Restar)
+							if (fich2.exists()) {
+								ArrayList<Equipo> equipos = new ArrayList<>();
+								finArchivo = false;
+								Equipo eq = null;
+								try {
+									ois = new ObjectInputStream(new FileInputStream(fich2));
+									while (!finArchivo) {
+										try {
+											eq = (Equipo) ois.readObject();
+											if (eq.getCod_e().equalsIgnoreCase(codEquipoDeleted)) {
+												eq.setTotalPuntos(eq.getTotalPuntos() - puntosDeleted);
+											}
+											equipos.add(eq);
+										} catch (EOFException e) {
+											finArchivo = true;
+										}
+									}
+									ois.close();
+
+									// Reescribir fichero equipos
+									try (ObjectOutputStream oos2 = new ObjectOutputStream(
+											new FileOutputStream(fich2))) {
+										for (Equipo e : equipos) {
+											oos2.writeObject(e);
+										}
+									}
+								} catch (IOException | ClassNotFoundException e) {
+									System.err.println("Error al actualizar puntos del equipo: " + e.getMessage());
+								}
+							}
+
 						} else {
 							System.out.println("Error al renombrar el fichero temporal.");
 						}
@@ -1107,6 +1146,7 @@ public class Main {
 										Jugador jug = (Jugador) st;
 										if (jug.getCod_e().equalsIgnoreCase(cod_e)) {
 											jugadoresEnEquipo++;
+
 										}
 									}
 								} catch (EOFException e) {
@@ -1196,6 +1236,36 @@ public class Main {
 						System.out.println("Jugador añadido correctamente.");
 					} catch (IOException e) {
 						System.out.println("Error escribiendo el fichero");
+					}
+				}
+
+				ArrayList<Equipo> equipos = new ArrayList<>();
+				finArchivo = false;
+				Equipo eq = null;
+
+				if (fich2.exists()) {
+					try {
+						ois = new ObjectInputStream(new FileInputStream(fich2));
+						while (!finArchivo) {
+							try {
+								eq = (Equipo) ois.readObject();
+								if (eq.getCod_e().equalsIgnoreCase(cod_e)) {
+									eq.setTotalPuntos(eq.getTotalPuntos() + puntos);
+								}
+								equipos.add(eq);
+							} catch (EOFException e) {
+								finArchivo = true;
+							}
+						}
+						ois.close();
+
+						try (ObjectOutputStream oos2 = new ObjectOutputStream(new FileOutputStream(fich2))) {
+							for (Equipo e : equipos) {
+								oos2.writeObject(e);
+							}
+						}
+					} catch (IOException | ClassNotFoundException e) {
+						System.err.println("Error al actualizar puntos del equipo: " + e.getMessage());
 					}
 				}
 			}
@@ -1449,7 +1519,7 @@ public class Main {
 			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
 
 			// --- UCAM Murcia ---
-			nombre = "UCAM Murcia"; 
+			nombre = "UCAM Murcia";
 			cod = "UCA - 1";
 			fecha = LocalDate.of(1985, 1, 1);
 			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
