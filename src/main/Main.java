@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Random;
 
 import clases.*;
 import excepciones.MaxEntException;
@@ -34,7 +35,7 @@ public class Main {
 			opc = menu();
 			switch (opc) {
 				case 1:
-					aniadirJugador(fich1);
+					aniadirJugador(fich1, fich2);
 					// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
 					// seteando. Se pediran todos los datos y se guardaran al final.
 					break;
@@ -95,12 +96,15 @@ public class Main {
 					eliminarEntrenador(fich1);
 					break;
 				case 13:
+					simulacionJornada(fich1, fich2);
+					break;
+				case 14:
 					System.out.println("Agurrr");
 					break;
 
 			}
 
-		} while (opc != 13);
+		} while (opc != 14);
 	}
 
 	public static void jugadoresPorPuntos(File fich1) {
@@ -449,6 +453,7 @@ public class Main {
 					if (ois != null)
 						ois.close();
 				} catch (IOException e) {
+					System.out.println("Error al cerrar el fichero");
 				}
 			}
 
@@ -711,105 +716,6 @@ public class Main {
 			}
 		} else {
 			System.out.println("El fichero no existe.");
-		}
-	}
-
-	public static void comprobarEquiposMinJugEnt(File fich1, File fich2) {
-		HashMap<String, int[]> conteoEquipos = new HashMap<>(); // [0] = Jugadores, [1] = Entrenadores
-		boolean finArchivo = false;
-		ObjectInputStream ois = null;
-		boolean continuar = true;
-		Equipo eq = null;
-		Staff st = null;
-		int[] contadores = null;
-		boolean todoCorrecto = true;
-		int numJugadores = 0;
-		int numEntrenadores = 0;
-		int[] datos = null;
-
-		if (!fich2.exists()) {
-			System.out.println("El fichero de equipos no existe.");
-			continuar = false;
-		} else {
-			try {
-				ois = new ObjectInputStream(new FileInputStream(fich2));
-				while (!finArchivo) {
-					try {
-						eq = (Equipo) ois.readObject();
-						conteoEquipos.put(eq.getCod_e(), new int[] { 0, 0 });
-					} catch (EOFException e) {
-						finArchivo = true;
-					}
-				}
-			} catch (IOException | ClassNotFoundException e) {
-				System.err.println("Error al leer Equipos.dat: " + e.getMessage());
-			} finally {
-				if (ois != null) {
-					try {
-						ois.close();
-					} catch (IOException e) {
-						System.err.println("Error al cerrar el flujo: " + e.getMessage());
-					}
-				}
-			}
-		}
-
-		if (continuar) {
-			if (!fich1.exists()) {
-				System.out.println("El fichero de staffs no existe.");
-				continuar = false;
-			} else {
-				finArchivo = false;
-				try {
-					ois = new ObjectInputStream(new FileInputStream(fich1));
-					while (!finArchivo) {
-						try {
-							st = (Staff) ois.readObject();
-							if (conteoEquipos.containsKey(st.getCod_e())) {
-								contadores = conteoEquipos.get(st.getCod_e());
-								if (st instanceof Jugador) {
-									contadores[0]++;
-								} else if (st instanceof Entrenador) {
-									contadores[1]++;
-								}
-							}
-						} catch (EOFException e) {
-							finArchivo = true;
-						}
-					}
-				} catch (IOException | ClassNotFoundException e) {
-					System.err.println("Error al leer Staffs.dat: " + e.getMessage());
-				} finally {
-					if (ois != null) {
-						try {
-							ois.close();
-						} catch (IOException e) {
-							System.err.println("Error al cerrar el flujo: " + e.getMessage());
-						}
-					}
-				}
-			}
-		}
-
-		if (continuar) {
-			System.out.println("\n--- Informe de validación de Equipos ---");
-			for (String codEquipo : conteoEquipos.keySet()) {
-				datos = conteoEquipos.get(codEquipo);
-				numJugadores = datos[0];
-				numEntrenadores = datos[1];
-
-				if (numJugadores < 5 || numEntrenadores < 1) {
-					todoCorrecto = false;
-					System.out.println("ALERTA: El equipo " + codEquipo + " no cumple los requisitos.");
-					System.out.println("\tJugadores: " + numJugadores + " (Mínimo 5)");
-					System.out.println("\tEntrenadores: " + numEntrenadores + " (Mínimo 1)");
-				}
-			}
-
-			if (todoCorrecto) {
-				System.out.println("Todos los equipos cumplen con los requisitos mínimos (5 jugadores, 1 entrenador).");
-			}
-			System.out.println("----------------------------------------");
 		}
 	}
 
@@ -1126,7 +1032,7 @@ public class Main {
 		}
 	}
 
-	private static void aniadirJugador(File fich1) {
+	private static void aniadirJugador(File fich1, File fich2) {
 		String nombre_s, pais, cod_e, tipo, cod_j = "JUG - ", cod_ju;
 		int edad, puntos, cont = 0;
 		double sueldo;
@@ -1140,6 +1046,7 @@ public class Main {
 		int jugadoresEnEquipo = 0;
 		boolean finCount = false;
 		boolean continuar = true;
+		boolean encontrado = false;
 
 		System.out.println("Introduce el nombre del Jugador: ");
 		nombre_s = Utilidades.introducirCadena();
@@ -1156,106 +1063,140 @@ public class Main {
 		pais = Utilidades.introducirCadena();
 		System.out.println("Introduce el sueldo: ");
 		sueldo = Utilidades.leerDouble();
-		System.out.println("Introduce el codigo del equipo al que pertenece: ");
-		cod_e = Utilidades.introducirCadena();
+		if (!fich2.exists()) {
+			System.out.println("No hay equipos registrados. No se puede añadir un entrenador.");
+		} else {
 
-		if (fich1.exists()) {
-			ObjectInputStream oisCount = null;
-			try {
-				oisCount = new ObjectInputStream(new FileInputStream(fich1));
-				while (!finCount) {
-					try {
-						Staff st = (Staff) oisCount.readObject();
-						if (st instanceof Jugador) {
-							Jugador jug = (Jugador) st;
-							if (jug.getCod_e().equalsIgnoreCase(cod_e)) {
-								jugadoresEnEquipo++;
+			do {
+				System.out.println("Equipos disponibles:");
+				mostrarEquipos(fich2);
+
+				System.out.println("Introduce el codigo del equipo: ");
+				cod_e = Utilidades.introducirCadena();
+
+				try {
+					ois = new ObjectInputStream(new FileInputStream(fich2));
+					finArchivo = false;
+					while (!finArchivo) {
+						try {
+							Equipo equipo = (Equipo) ois.readObject();
+							if (equipo.getCod_e().equalsIgnoreCase(cod_e)) {
+								encontrado = true;
+								finArchivo = true;
+							}
+						} catch (EOFException e) {
+							finArchivo = true;
+						}
+					}
+					ois.close();
+				} catch (IOException | ClassNotFoundException e) {
+					System.err.println("Error al leer equipos: " + e.getMessage());
+				}
+
+				if (!encontrado) {
+					System.out.println("El equipo no existe. Reintente.");
+				} else {
+					if (fich1.exists()) {
+						ObjectInputStream oisCount = null;
+						try {
+							oisCount = new ObjectInputStream(new FileInputStream(fich1));
+							while (!finCount) {
+								try {
+									Staff st = (Staff) oisCount.readObject();
+									if (st instanceof Jugador) {
+										Jugador jug = (Jugador) st;
+										if (jug.getCod_e().equalsIgnoreCase(cod_e)) {
+											jugadoresEnEquipo++;
+										}
+									}
+								} catch (EOFException e) {
+									finCount = true;
+								}
+							}
+						} catch (IOException | ClassNotFoundException e) {
+							System.err.println("Error al verificar cantidad de jugadores: " + e.getMessage());
+						} finally {
+							try {
+								if (oisCount != null) {
+									oisCount.close();
+								}
+							} catch (IOException e) {
+
 							}
 						}
-					} catch (EOFException e) {
-						finCount = true;
 					}
-				}
-			} catch (IOException | ClassNotFoundException e) {
-				System.err.println("Error al verificar cantidad de jugadores: " + e.getMessage());
-			} finally {
-				try {
-					if (oisCount != null) {
-						oisCount.close();
-					}
-				} catch (IOException e) {
 
-				}
-			}
-		}
-
-		try {
-			if (jugadoresEnEquipo >= 15) {
-				throw new MaxJugException("El equipo " + cod_e + " ya tiene 15 jugadores. No se pueden añadir más.");
-			}
-		} catch (MaxJugException e) {
-			System.out.println(e.getMessage());
-			continuar = false;
-		}
-
-		if (continuar) {
-			System.out.println("Introduce los puntos del jugador: ");
-			puntos = Utilidades.leerInt();
-			do {
-				System.out.println("Introduce la posicion del jugador: (BASE, ALERO, PIVOT)");
-				tipo = Utilidades.introducirCadena();
-				try {
-					posicion = POSICION.valueOf(tipo);
-					correcto = true;
-				} catch (IllegalArgumentException e) {
-					System.err.println("El valor '" + tipo + "' no es una posicion válida.");
-					correcto = false;
-				}
-			} while (!correcto);
-
-			// Contar total de registros para generar el ID (JUG - X)
-			finArchivo = false;
-			if (fich1.exists()) {
-				try {
-					ois = new ObjectInputStream(new FileInputStream(fich1));
-					while (!finArchivo) {
-						ois.readObject();
-						cont++;
-					}
-				} catch (EOFException e) {
-					finArchivo = true;
-				} catch (Exception e) {
-					System.err.println("Error al contar registros: " + e.getMessage());
-				} finally {
 					try {
-						if (ois != null)
-							ois.close();
-					} catch (IOException e) {
+						if (jugadoresEnEquipo >= 15) {
+							throw new MaxJugException(
+									"El equipo " + cod_e + " ya tiene 15 jugadores. No se pueden añadir más.");
+						}
+					} catch (MaxJugException e) {
+						System.out.println(e.getMessage());
+						continuar = false;
 					}
 				}
-			}
+			} while (!encontrado);
 
-			cod_ju = cod_j + (cont + 1);
-			System.out.println("El codigo del jugador es " + cod_ju);
-			Jugador j = new Jugador(cod_ju, nombre_s, edad, fechaIncor, pais, sueldo, cod_e, puntos, posicion);
+			if (continuar) {
+				System.out.println("Introduce los puntos del jugador: ");
+				puntos = Utilidades.leerInt();
+				do {
+					System.out.println("Introduce la posicion del jugador: (BASE, ALERO, PIVOT)");
+					tipo = Utilidades.introducirCadena();
+					try {
+						posicion = POSICION.valueOf(tipo);
+						correcto = true;
+					} catch (IllegalArgumentException e) {
+						System.err.println("El valor '" + tipo + "' no es una posicion válida.");
+						correcto = false;
+					}
+				} while (!correcto);
 
-			if (!fich1.exists()) {
-				try {
-					oos = new ObjectOutputStream(new FileOutputStream(fich1));
-					oos.writeObject(j);
-					oos.close();
-					System.out.println("Jugador añadido correctamente.");
-				} catch (IOException e) {
-					System.out.println("Error escribiendo el fichero");
+				// Contar total de registros para generar el ID (JUG - X)
+				finArchivo = false;
+				if (fich1.exists()) {
+					try {
+						ois = new ObjectInputStream(new FileInputStream(fich1));
+						while (!finArchivo) {
+							ois.readObject();
+							cont++;
+						}
+					} catch (EOFException e) {
+						finArchivo = true;
+					} catch (Exception e) {
+						System.err.println("Error al contar registros: " + e.getMessage());
+					} finally {
+						try {
+							if (ois != null)
+								ois.close();
+						} catch (IOException e) {
+						}
+					}
 				}
-			} else {
-				try {
-					moos = new MyObjectOutputStream(new FileOutputStream(fich1, true));
-					moos.writeObject(j);
-					moos.close();
-					System.out.println("Jugador añadido correctamente.");
-				} catch (IOException e) {
-					System.out.println("Error escribiendo el fichero");
+
+				cod_ju = cod_j + (cont + 1);
+				System.out.println("El codigo del jugador es " + cod_ju);
+				Jugador j = new Jugador(cod_ju, nombre_s, edad, fechaIncor, pais, sueldo, cod_e, puntos, posicion);
+
+				if (!fich1.exists()) {
+					try {
+						oos = new ObjectOutputStream(new FileOutputStream(fich1));
+						oos.writeObject(j);
+						oos.close();
+						System.out.println("Jugador añadido correctamente.");
+					} catch (IOException e) {
+						System.out.println("Error escribiendo el fichero");
+					}
+				} else {
+					try {
+						moos = new MyObjectOutputStream(new FileOutputStream(fich1, true));
+						moos.writeObject(j);
+						moos.close();
+						System.out.println("Jugador añadido correctamente.");
+					} catch (IOException e) {
+						System.out.println("Error escribiendo el fichero");
+					}
 				}
 			}
 		}
@@ -1326,56 +1267,284 @@ public class Main {
 		System.out.println("10. Mostrar todos los jugadores de una posicion");
 		System.out.println("11. Mostrar jugadores ordenados por puntos");
 		System.out.println("12. Eliminar entrenador");
-		System.out.println("13. Salir");
+		System.out.println("13. Simulacion de Jornada");
+		System.out.println("14. Salir");
 		System.out.println("¿Qué quieres hacer?");
-		ele = Utilidades.leerInt(1, 13);
+		ele = Utilidades.leerInt(1, 14);
 		return ele;
 	}
 
 	private static void fillData(File fich2) {
 		ObjectOutputStream oos = null;
 
-		// Listado de 15 equipos de la ACB
-		String[] nombres = {
-				"Real Madrid", "Barca", "Unicaja", "Valencia Basket", "Lenovo Tenerife",
-				"Gran Canaria", "Baskonia", "Baxi Manresa", "Joventut Badalona", "UCAM Murcia",
-				"Casademont Zaragoza", "Surne Bilbao Basket", "Rio Breogan", "Coviran Granada", "MoraBanc Andorra"
-		};
-
 		try {
 			// Creamos el flujo de escritura (sobrescribe si existe para empezar de cero)
 			oos = new ObjectOutputStream(new FileOutputStream(fich2));
+			Equipo eq;
+			String nombre;
+			String cod;
+			String nombreArchivoCantico;
+			File archivoCantico;
+			FileWriter fw;
+			LocalDate fecha;
 
-			for (String nombre : nombres) {
-				// 1. Generar código: 3 primeras letras + " - 1"
-				String cod = nombre.substring(0, 3).toUpperCase() + " - 1";
-
-				// 2. Definir fecha (aleatoria entre 1920 y 2000 para variedad)
-				LocalDate fecha = LocalDate.of(1920 + (int) (Math.random() * 80), 1, 1);
-
-				// 3. Manejo del Cántico:
-				// Dado que FileWriter no es serializable, enviamos null en el objeto.
-				// Pero creamos físicamente el archivo del cántico para que exista.
-				String nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
-				File archivoCantico = new File(nombreArchivoCantico);
-
-				if (!archivoCantico.exists()) {
-					FileWriter fw = new FileWriter(archivoCantico);
-					fw.write("¡Vamos, vamos " + nombre + "!");
-					fw.close();
-				}
-
-				// 4. Crear el objeto Equipo
-				// Importante: El constructor pide un FileWriter, pasamos null por ahora
-				// para evitar errores de serialización, ya que el archivo físico ya se creó.
-				Equipo eq = new Equipo(cod, nombre, fecha, null);
-
-				// 5. Escribir el equipo 1 por 1 en el fichero .dat
-				oos.writeObject(eq);
-				System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+			// --- MoraBanc Andorra ---
+			nombre = "MoraBanc Andorra";
+			cod = "MOR - 1";
+			fecha = LocalDate.of(1970, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
 			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(150 + 200 + 300 + 120 + 450);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
 
-			System.out.println("\n--- Proceso finalizado: 15 equipos guardados en Equipos.dat ---");
+			// --- Real Madrid ---
+			nombre = "Real Madrid";
+			cod = "REA - 1";
+			fecha = LocalDate.of(1931, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(80 + 500 + 600 + 350 + 210);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Barca ---
+			nombre = "Barca";
+			cod = "BAR - 1";
+			fecha = LocalDate.of(1926, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(190 + 175 + 310 + 240 + 160);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Unicaja ---
+			nombre = "Unicaja";
+			cod = "UNI - 1";
+			fecha = LocalDate.of(1977, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(130 + 180 + 140 + 150 + 170);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Valencia Basket ---
+			nombre = "Valencia Basket";
+			cod = "VAL - 1";
+			fecha = LocalDate.of(1986, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(220 + 160 + 110 + 130 + 250);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Lenovo Tenerife ---
+			nombre = "Lenovo Tenerife";
+			cod = "LEN - 1";
+			fecha = LocalDate.of(1939, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(200 + 150 + 160 + 140 + 280);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Gran Canaria ---
+			nombre = "Gran Canaria";
+			cod = "GRA - 1";
+			fecha = LocalDate.of(1963, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(140 + 130 + 180 + 150 + 160);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Baskonia ---
+			nombre = "Baskonia";
+			cod = "BAS - 1";
+			fecha = LocalDate.of(1959, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(250 + 180 + 170 + 160 + 210);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Baxi Manresa ---
+			nombre = "Baxi Manresa";
+			cod = "BAX - 1";
+			fecha = LocalDate.of(1931, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(140 + 150 + 90 + 190 + 160);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Joventut Badalona ---
+			nombre = "Joventut Badalona";
+			cod = "JOV - 1";
+			fecha = LocalDate.of(1930, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(180 + 140 + 100 + 90 + 250);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- UCAM Murcia ---
+			nombre = "UCAM Murcia";
+			cod = "UCA - 1";
+			fecha = LocalDate.of(1985, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(160 + 190 + 170 + 150 + 210);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Casademont Zaragoza ---
+			nombre = "Casademont Zaragoza";
+			cod = "CAS - 1";
+			fecha = LocalDate.of(2002, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(160 + 150 + 100 + 140 + 200);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Surne Bilbao Basket ---
+			nombre = "Surne Bilbao Basket";
+			cod = "SUR - 1";
+			fecha = LocalDate.of(2000, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(170 + 180 + 130 + 120 + 190);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Rio Breogan ---
+			nombre = "Rio Breogan";
+			cod = "RIO - 1";
+			fecha = LocalDate.of(1966, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(140 + 130 + 150 + 140 + 160);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Coviran Granada ---
+			nombre = "Coviran Granada";
+			cod = "COV - 1";
+			fecha = LocalDate.of(2012, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(150 + 130 + 140 + 160 + 200);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			// --- Bilbao Basket ---
+			nombre = "Bilbao Basket";
+			cod = "BIL - 1";
+			fecha = LocalDate.of(2000, 1, 1);
+			nombreArchivoCantico = nombre.replace(" ", "_") + "_Cantico.txt";
+			archivoCantico = new File(nombreArchivoCantico);
+			if (!archivoCantico.exists()) {
+				fw = new FileWriter(archivoCantico);
+				fw.write("¡Vamos, vamos " + nombre + "!");
+				fw.close();
+			}
+			eq = new Equipo(cod, nombre, fecha, null);
+			eq.setTotalPuntos(1600 + 150 + 1300 + 140 + 1200);
+			oos.writeObject(eq);
+			System.out.println("Equipo añadido: " + nombre + " [" + cod + "]");
+
+			System.out.println("\n--- Proceso finalizado: 16 equipos guardados en Equipos.dat ---");
 
 		} catch (IOException e) {
 			System.err.println("Error al procesar los equipos: " + e.getMessage());
@@ -1385,6 +1554,158 @@ public class Main {
 					oos.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void simulacionJornada(File fich1, File fich2) {
+		ArrayList<Equipo> equipos = new ArrayList<>();
+		ArrayList<Jugador> jugadoresEquipo1 = new ArrayList<>();
+		ArrayList<Jugador> jugadoresEquipo2 = new ArrayList<>();
+		ObjectInputStream ois = null;
+		boolean finArchivo = false;
+		Staff st = null;
+		Jugador jug = null;
+		Equipo eq = null;
+		Equipo equipo1 = null;
+		Equipo equipo2 = null;
+		int puntosEquipo1 = 0;
+		int puntosEquipo2 = 0;
+		int puntosJugador = 0;
+		int i = 0;
+		int j = 0;
+		int numPartido = 1;
+		Random random = new Random();
+
+		// 1. Leer todos los equipos del fichero
+		if (!fich2.exists()) {
+			System.out.println("No hay equipos registrados.");
+		} else {
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich2));
+				while (!finArchivo) {
+					try {
+						eq = (Equipo) ois.readObject();
+						equipos.add(eq);
+					} catch (EOFException e) {
+						finArchivo = true;
+					}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error al leer los equipos: " + e.getMessage());
+			} finally {
+				if (ois != null) {
+					try {
+						ois.close();
+					} catch (IOException e) {
+						System.err.println("Error al cerrar flujo: " + e.getMessage());
+					}
+				}
+			}
+
+			// 2. Verificar que hay exactamente 16 equipos
+			if (equipos.size() != 16) {
+				System.out.println("Se necesitan exactamente 16 equipos para la simulación. Hay: " + equipos.size());
+			} else {
+				// 3. Mezclar aleatoriamente los equipos
+				Collections.shuffle(equipos);
+				System.out.println("\n========================================");
+				System.out.println("     SIMULACIÓN DE JORNADA");
+				System.out.println("========================================\n");
+
+				// 4. Enfrentar equipos de 2 en 2 (8 partidos)
+				i = 0;
+				while (i < equipos.size()) {
+					equipo1 = equipos.get(i);
+					equipo2 = equipos.get(i + 1);
+					puntosEquipo1 = 0;
+					puntosEquipo2 = 0;
+					jugadoresEquipo1.clear();
+					jugadoresEquipo2.clear();
+
+					// Leer jugadores de ambos equipos
+					finArchivo = false;
+					try {
+						ois = new ObjectInputStream(new FileInputStream(fich1));
+						while (!finArchivo) {
+							try {
+								st = (Staff) ois.readObject();
+								if (st instanceof Jugador) {
+									jug = (Jugador) st;
+									if (jug.getCod_e().equalsIgnoreCase(equipo1.getCod_e())) {
+										jugadoresEquipo1.add(jug);
+									} else if (jug.getCod_e().equalsIgnoreCase(equipo2.getCod_e())) {
+										jugadoresEquipo2.add(jug);
+									}
+								}
+							} catch (EOFException e) {
+								finArchivo = true;
+							}
+						}
+					} catch (IOException | ClassNotFoundException e) {
+						System.err.println("Error al leer jugadores: " + e.getMessage());
+					} finally {
+						if (ois != null) {
+							try {
+								ois.close();
+							} catch (IOException e) {
+								System.err.println("Error al cerrar flujo: " + e.getMessage());
+							}
+						}
+					}
+
+					// Calcular puntos aleatorios para el equipo 1
+					j = 0;
+					while (j < jugadoresEquipo1.size()) {
+						puntosJugador = random.nextInt(101); // 0 a 100
+						puntosEquipo1 = puntosEquipo1 + puntosJugador;
+						j++;
+					}
+
+					// Calcular puntos aleatorios para el equipo 2
+					j = 0;
+					while (j < jugadoresEquipo2.size()) {
+						puntosJugador = random.nextInt(101); // 0 a 100
+						puntosEquipo2 = puntosEquipo2 + puntosJugador;
+						j++;
+					}
+
+					// Mostrar resultado del partido
+					System.out.println("PARTIDO " + numPartido);
+					System.out.println(equipo1.getNom_e() + " " + puntosEquipo1 + " - " + puntosEquipo2 + " "
+							+ equipo2.getNom_e());
+
+					// Determinar ganador y asignar puntos de clasificación
+					if (puntosEquipo1 > puntosEquipo2) {
+						equipo1.setTotalPuntos(equipo1.getTotalPuntos() + 2);
+						System.out.println("Ganador: " + equipo1.getNom_e() + " (+2 puntos)");
+					} else if (puntosEquipo2 > puntosEquipo1) {
+						equipo2.setTotalPuntos(equipo2.getTotalPuntos() + 2);
+						System.out.println("Ganador: " + equipo2.getNom_e() + " (+2 puntos)");
+					} else {
+						equipo1.setTotalPuntos(equipo1.getTotalPuntos() + 1);
+						equipo2.setTotalPuntos(equipo2.getTotalPuntos() + 1);
+						System.out.println("Empate (+1 punto cada uno)");
+					}
+					System.out.println("----------------------------------------");
+
+					numPartido++;
+					i = i + 2;
+				}
+
+				// 5. Mostrar clasificación final
+				Collections.sort(equipos);
+				System.out.println("\n========================================");
+				System.out.println("     CLASIFICACIÓN TRAS LA JORNADA");
+				System.out.println("========================================");
+				i = 1;
+				j = 0;
+				while (j < equipos.size()) {
+					eq = equipos.get(j);
+					System.out.println(i + ". " + eq.getNom_e() + " - " + eq.getTotalPuntos() + " pts");
+					i++;
+					j++;
+				}
 			}
 		}
 	}
@@ -1575,6 +1896,19 @@ public class Main {
 			oos.writeObject(new Jugador("JUG - " + i++, "Cristiano Felicio", 31, LocalDate.of(2022, 8, 1), "Brasil",
 					2500, "COV - 1", 200, POSICION.PIVOT));
 
+			// --- Equipo: BIL - 1 (Bilbao Basket) ---
+			oos.writeObject(new Jugador("JUG - " + i++, "Alex Mumbrú", 44, LocalDate.of(2019, 7, 1), "España", 2000,
+					"BIL - 1", 1600, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Adam Smith", 31, LocalDate.of(2022, 7, 10), "USA", 1800,
+					"BIL - 1", 150, POSICION.BASE));
+			oos.writeObject(new Jugador("JUG - " + i++, "Tomeu Rigo", 28, LocalDate.of(2023, 7, 15), "España", 1600,
+					"BIL - 1", 1300, POSICION.BASE));
+			oos.writeObject(
+					new Jugador("JUG - " + i++, "Tyson Pérez", 25, LocalDate.of(2022, 7, 20), "República Dominicana",
+							1700, "BIL - 1", 140, POSICION.ALERO));
+			oos.writeObject(new Jugador("JUG - " + i++, "Sacha Katichenko", 22, LocalDate.of(2023, 7, 5), "Francia",
+					1500, "BIL - 1", 1200, POSICION.PIVOT));
+
 			// --- ENTRENADORES ---
 			oos.writeObject(new Entrenador("ENT - " + k++, "Natxo Lezcano", 50, LocalDate.of(2022, 6, 1), "España",
 					50000, "MOR - 1", "Defensa Zonal", new HashMap<>()));
@@ -1606,6 +1940,9 @@ public class Main {
 					48000, "RIO - 1", "Físico", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Pablo Pin", 40, LocalDate.of(2012, 8, 1), "España", 45000,
 					"COV - 1", "Continuidad", new HashMap<>()));
+			oos.writeObject(
+					new Entrenador("ENT - " + k++, "Jose Luis Mendilibar", 52, LocalDate.of(2022, 6, 20), "España",
+							50000, "BIL - 1", "Orden", new HashMap<>()));
 
 			System.out.println("Escritura directa finalizada: 75 jugadores y 15 entrenadores guardados en Staffs.dat");
 			oos.close();
