@@ -1633,24 +1633,23 @@ public class Main {
 		ArrayList<Jugador> jugadoresEquipo1 = new ArrayList<>();
 		ArrayList<Jugador> jugadoresEquipo2 = new ArrayList<>();
 		ObjectInputStream ois = null;
-		boolean finArchivo = false;
 		Staff st = null;
 		Jugador jug = null;
 		Equipo eq = null;
 		Equipo equipo1 = null;
 		Equipo equipo2 = null;
+		Random random = new Random();
 		int puntosEquipo1 = 0;
 		int puntosEquipo2 = 0;
 		int puntosJugador = 0;
 		int i = 0;
 		int j = 0;
 		int numPartido = 1;
-		Random random = new Random();
+		boolean finArchivo = false;
+		boolean procesarJornada = false;
 
 		// 1. Leer todos los equipos del fichero
-		if (!fich2.exists()) {
-			System.out.println("No hay equipos registrados.");
-		} else {
+		if (fich2.exists()) {
 			try {
 				ois = new ObjectInputStream(new FileInputStream(fich2));
 				while (!finArchivo) {
@@ -1661,6 +1660,7 @@ public class Main {
 						finArchivo = true;
 					}
 				}
+				procesarJornada = true;
 			} catch (IOException | ClassNotFoundException e) {
 				System.err.println("Error al leer los equipos: " + e.getMessage());
 			} finally {
@@ -1672,8 +1672,11 @@ public class Main {
 					}
 				}
 			}
+		} else {
+			System.out.println("No hay equipos registrados.");
+		}
 
-			// 2. Verificar que hay exactamente 16 equipos
+		if (procesarJornada) {
 			if (equipos.size() != 16) {
 				System.out.println("Se necesitan exactamente 16 equipos para la simulación. Hay: " + equipos.size());
 			} else {
@@ -1696,20 +1699,22 @@ public class Main {
 					// Leer jugadores de ambos equipos
 					finArchivo = false;
 					try {
-						ois = new ObjectInputStream(new FileInputStream(fich1));
-						while (!finArchivo) {
-							try {
-								st = (Staff) ois.readObject();
-								if (st instanceof Jugador) {
-									jug = (Jugador) st;
-									if (jug.getCod_e().equalsIgnoreCase(equipo1.getCod_e())) {
-										jugadoresEquipo1.add(jug);
-									} else if (jug.getCod_e().equalsIgnoreCase(equipo2.getCod_e())) {
-										jugadoresEquipo2.add(jug);
+						if (fich1.exists()) {
+							ois = new ObjectInputStream(new FileInputStream(fich1));
+							while (!finArchivo) {
+								try {
+									st = (Staff) ois.readObject();
+									if (st instanceof Jugador) {
+										jug = (Jugador) st;
+										if (jug.getCod_e().equalsIgnoreCase(equipo1.getCod_e())) {
+											jugadoresEquipo1.add(jug);
+										} else if (jug.getCod_e().equalsIgnoreCase(equipo2.getCod_e())) {
+											jugadoresEquipo2.add(jug);
+										}
 									}
+								} catch (EOFException e) {
+									finArchivo = true;
 								}
-							} catch (EOFException e) {
-								finArchivo = true;
 							}
 						}
 					} catch (IOException | ClassNotFoundException e) {
@@ -1724,19 +1729,23 @@ public class Main {
 						}
 					}
 
-					// Calcular puntos aleatorios para el equipo 1
+					// Calcular puntos aleatorios para el equipo 1 y sumarlos al total del equipo
 					j = 0;
 					while (j < jugadoresEquipo1.size()) {
 						puntosJugador = random.nextInt(101); // 0 a 100
 						puntosEquipo1 = puntosEquipo1 + puntosJugador;
+						// Sumar puntos al total histórico del equipo
+						equipo1.setTotalPuntos(equipo1.getTotalPuntos() + puntosJugador);
 						j++;
 					}
 
-					// Calcular puntos aleatorios para el equipo 2
+					// Calcular puntos aleatorios para el equipo 2 y sumarlos al total del equipo
 					j = 0;
 					while (j < jugadoresEquipo2.size()) {
 						puntosJugador = random.nextInt(101); // 0 a 100
 						puntosEquipo2 = puntosEquipo2 + puntosJugador;
+						// Sumar puntos al total histórico del equipo
+						equipo2.setTotalPuntos(equipo2.getTotalPuntos() + puntosJugador);
 						j++;
 					}
 
