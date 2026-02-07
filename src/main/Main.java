@@ -929,7 +929,7 @@ public class Main {
 		edad = Utilidades.leerInt(18, 80);
 		System.out.println("Introduce la fecha de entrada: ");
 		fecha = Utilidades.leerFechaAMD();
-		while ((edad - 16) < (2026 - fecha.getYear())) {
+		while ((edad - 16) < (2026 - fecha.getYear()) || fecha.getYear() > LocalDate.now().getYear()) {
 			System.out.println("Error, La fecha de incorporación no puede ser anterior a los 16 años de edad.");
 			System.out.println("Introduce la fecha de incorporación:(A/M/D) ");
 			fecha = Utilidades.leerFechaAMD();
@@ -1093,7 +1093,7 @@ public class Main {
 		edad = Utilidades.leerInt(16, 70);
 		System.out.println("Introduce la fecha de incorporación:(A/M/D) ");
 		fechaIncor = Utilidades.leerFechaAMD();
-		while ((edad - 16) < (2026 - fechaIncor.getYear())) {
+		while ((edad - 16) < (2026 - fechaIncor.getYear()) || fechaIncor.getYear() > LocalDate.now().getYear()) {
 			System.out.println("Error, La fecha de incorporación no puede ser anterior a los 16 años de edad.");
 			System.out.println("Introduce la fecha de incorporación:(A/M/D) ");
 			fechaIncor = Utilidades.leerFechaAMD();
