@@ -67,7 +67,7 @@ public class Main {
 				// Se mostrara la info de un equipo.
 				break;
 			case 7:
-			    clasificacion(fich2, fich1);
+				clasificacion(fich2, fich1);
 				// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
 				// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
 				// un equipo.
@@ -214,6 +214,7 @@ public class Main {
 		String codigoEquipoActual = "";
 		String nuevoCodigoEquipo = "";
 		int contCoincidencias = 0;
+		int jugEquiDestino;
 		boolean finArchivo = false;
 		boolean jugadorEncontrado = false;
 		boolean equipoValido = false;
@@ -356,7 +357,29 @@ public class Main {
 							System.out.println(
 									"ERROR: El jugador ya pertenece a ese equipo. Introduce un equipo diferente.");
 						} else {
-							equipoValido = true;
+							//cuenta jugadores en el equipo destino antes de aceptar el traspaso
+							jugEquiDestino = 0;
+							finArchivo = false;
+							if (fich1.exists()) {
+								try (ObjectInputStream oisCount = new ObjectInputStream(new FileInputStream(fich1))) {
+									while (!finArchivo) {
+										try {
+											Staff sCount = (Staff) oisCount.readObject();
+											if (sCount instanceof Jugador && sCount.getCod_e().equalsIgnoreCase(nuevoCodigoEquipo)) {
+												jugEquiDestino++;
+											}
+										} catch (EOFException e) { 
+											finArchivo = true;
+										}
+									}
+								} catch (Exception e) {
+								}
+							}
+							if (jugEquiDestino >= 15) {
+								System.out.println("ERROR: El equipo de destino ya tiene 15 jugadores. Elija otro.");
+							} else {
+								equipoValido = true;
+							}
 						}
 					}
 				}
@@ -422,52 +445,52 @@ public class Main {
 	}
 
 	public static void clasificacion(File fichEquipos, File fichStaff) {
-	    ArrayList<Equipo> equipos = new ArrayList<>();
-	    ArrayList<Jugador> jugadores = new ArrayList<>();
-	    int suma = 0;
+		ArrayList<Equipo> equipos = new ArrayList<>();
+		ArrayList<Jugador> jugadores = new ArrayList<>();
+		int suma = 0;
 
-	    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichEquipos))) {
-	        while (true) {
-	            equipos.add((Equipo) ois.readObject());
-	        }
-	    } catch (EOFException e) {
-	        // fin del fichero
-	    } catch (Exception e) {
-	        System.out.println("Error leyendo equipos");
-	    }
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichEquipos))) {
+			while (true) {
+				equipos.add((Equipo) ois.readObject());
+			}
+		} catch (EOFException e) {
+			// fin del fichero
+		} catch (Exception e) {
+			System.out.println("Error leyendo equipos");
+		}
 
-	    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichStaff))) {
-	        while (true) {
-	            Object obj = ois.readObject();
-	            if (obj instanceof Jugador) {
-	                jugadores.add((Jugador) obj);
-	            }
-	        }
-	    } catch (EOFException e) {
-	        // fin del fichero
-	    } catch (Exception e) {
-	        System.out.println("Error leyendo jugadores");
-	    }
-	    for (Equipo e : equipos) {
-	        suma = 0;
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fichStaff))) {
+			while (true) {
+				Object obj = ois.readObject();
+				if (obj instanceof Jugador) {
+					jugadores.add((Jugador) obj);
+				}
+			}
+		} catch (EOFException e) {
+			// fin del fichero
+		} catch (Exception e) {
+			System.out.println("Error leyendo jugadores");
+		}
+		for (Equipo e : equipos) {
+			suma = 0;
 
-	        for (Jugador j : jugadores) {
-	            if (e.getCod_e().equals(j.getCod_e())) {
-	                suma += j.getPuntos();
-	            }
-	        }
-	        e.setTotalPuntos(suma);
-	    }
+			for (Jugador j : jugadores) {
+				if (e.getCod_e().equals(j.getCod_e())) {
+					suma += j.getPuntos();
+				}
+			}
+			e.setTotalPuntos(suma);
+		}
 
-	    Collections.sort(equipos);
-	    System.out.println("\nCLASIFICACIÓN DE LA LIGA");
-	    System.out.println("------------------------");
-	    for (int i = 0; i < equipos.size(); i++) {
-	        System.out.println((i + 1) + ". " + equipos.get(i).getNom_e() + " - Puntos: " + equipos.get(i).getTotalPuntos());
-	    }
+		Collections.sort(equipos);
+		System.out.println("\nCLASIFICACIÓN DE LA LIGA");
+		System.out.println("------------------------");
+		for (int i = 0; i < equipos.size(); i++) {
+			System.out.println((i + 1) + ". " + equipos.get(i).getNom_e() + " - Puntos: " + equipos.get(i).getTotalPuntos());
+		}
 	}
 
-	
+
 	private static void infoEquipo(File fich2) {
 		ArrayList<Equipo> equipos = new ArrayList<>();
 		ObjectInputStream ois = null;
@@ -1150,6 +1173,7 @@ public class Main {
 		} else {
 
 			do {
+				continuar = true;//para asegurar que los reintentos funcionen correctamente
 				System.out.println("Equipos disponibles:");
 				mostrarEquipos(fich2);
 
@@ -1211,12 +1235,12 @@ public class Main {
 
 							}
 						}
-					    // VALIDACIÓN: Si el equipo tiene 15 o más, no permitimos continuar
-					    if (jugadoresEnEquipo >= 15) {
-					        System.out.println("El equipo " + cod_e + " ya tiene 15 jugadores. No se pueden añadir más.");
-					        continuar = false;
-					        encontrado = false; //Forzamos a que el bucle pida otro equipo
-					    }
+						// VALIDACIÓN: Si el equipo tiene 15 o más, no permitimos continuar
+						if (jugadoresEnEquipo >= 15) {
+							System.out.println("El equipo " + cod_e + " ya tiene 15 jugadores. No se pueden añadir más.");
+							continuar = false;
+							encontrado = false; //Forzamos a que el bucle pida otro equipo
+						}
 					}
 
 					try {
