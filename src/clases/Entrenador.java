@@ -2,11 +2,8 @@ package clases;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Entrenador extends Staff{
-	
-	
 	/**
 	 * 
 	 */
@@ -20,32 +17,22 @@ public class Entrenador extends Staff{
 		this.jugadaBase = jugadaBase;
 		this.Ejercicio = ejercicio;
 	}
-	
-	
 
 	public String getJugadaBase() {
 		return jugadaBase;
 	}
 
-
-
 	public void setJugadaBase(String jugadaBase) {
 		this.jugadaBase = jugadaBase;
 	}
-
-
 
 	public HashMap<String, Ejercicio> getEjercicio() {
 		return Ejercicio;
 	}
 
-
-
 	public void setEjercicio(HashMap<String, Ejercicio> ejercicio) {
 		Ejercicio = ejercicio;
 	}
-
-
 
 	@Override
 	public void visualizar() {
@@ -58,14 +45,5 @@ public class Entrenador extends Staff{
 		System.out.println("Codigo del equipo: " + getCod_e());
 		System.out.println("Jugada base: " + getJugadaBase());
 		System.out.println("Ejercicios: " + getEjercicio());		
-	}
-
-	@Override
-	public int calcularAntiguedad() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	
-	
+	}	
 }
