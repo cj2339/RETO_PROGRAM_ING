@@ -467,6 +467,7 @@ public class Main {
 	    }
 	}
 
+	
 	private static void infoEquipo(File fich2) {
 		ArrayList<Equipo> equipos = new ArrayList<>();
 		ObjectInputStream ois = null;
