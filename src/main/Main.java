@@ -34,73 +34,78 @@ public class Main {
 		do {
 			opc = menu();
 			switch (opc) {
-			case 1:
-				aniadirJugador(fich1, fich2);
-				// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
-				// seteando. Se pediran todos los datos y se guardaran al final.
-				break;
-			case 2:
-				aniadirEntrenador(fich1, fich2);
-				// El codigo se autogenerara (Ejemplo: ENT - 001) los demas datos NO se iran
-				// seteando. Se pediran todos los datos y se guardaran al final.
-				break;
-			case 3:
-				aniadirEntrenamiento(fich1);
-				// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
-				// añada, advertiremos de que el formato del codigo deberan de ser minimo
-				// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
-				// los datos y se guardaran al final.
-				break;
-			case 4:
-				editarEdad(fich1);
-				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-				// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
-				// Se comprobara que el codigo que ha introducido existe.
-				break;
-			case 5:
-				eliminarJugador(fich1, fich2);
-				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-				// codigos. Se comprobara que el jugador exista para poder eliminarlo.
-				break;
-			case 6:
-				infoEquipo(fich2);
-				// Se mostrara la info de un equipo.
-				break;
-			case 7:
-				clasificacion(fich2, fich1);
-				// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
-				// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
-				// un equipo.
-				break;
-			case 8:
-				mostrarStaffs(fich1);
-				// muestra el jugador que mas años haya estado en un equipo.
-				break;
-				// Opcionales si nos vemos bn de tiempo.
-			case 9:
-				traspasoJugador(fich1, fich2);
-				// Se mostrara un listado de tosdos los jugadores para que pueda ver los
-				// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
-				// guardara la info para que se traspase.
-				break;
-			case 10:
-				mostrarJugadoresPos(fich1);
-				// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
-				// este en el enum. Se mostraran los juadores de dicha posicion
-				break;
-			case 11:
-				jugadoresPorPuntos(fich1);
-				// Se mostrara la lista de jugadores ordenados por los puntos.
-				break;
-			case 12:
-				eliminarEntrenador(fich1);
-				break;
-			case 13:
-				simulacionJornada(fich1, fich2);
-				break;
-			case 14:
-				System.out.println("Agurrr");
-				break;
+				case 1:
+					aniadirJugador(fich1, fich2);
+					// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
+					// seteando. Se pediran todos los datos y se guardaran al final.
+					break;
+				case 2:
+					aniadirEntrenador(fich1, fich2);
+					// El codigo se autogenerara (Ejemplo: ENT - 001) los demas datos NO se iran
+					// seteando. Se pediran todos los datos y se guardaran al final.
+					break;
+				case 3:
+					aniadirEntrenamiento(fich1);
+					// Se le preguntara el codigo y se comprobara que no exista. Antes de que lo
+					// añada, advertiremos de que el formato del codigo deberan de ser minimo
+					// 2 letras y 3 numeros. los demas datos NO se iran seteando. Se pediran todos
+					// los datos y se guardaran al final.
+					break;
+				case 4:
+					editarEdad(fich1);
+					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+					// codigos. Despues se le preguntara el codigo del jugador que quiera modificar.
+					// Se comprobara que el codigo que ha introducido existe.
+					break;
+				case 5:
+					eliminarJugador(fich1, fich2);
+					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+					// codigos. Se comprobara que el jugador exista para poder eliminarlo.
+					break;
+				case 6:
+					infoEquipo(fich2);
+					// Se mostrara la info de un equipo.
+					break;
+				case 7:
+					clasificacion(fich2, fich1);
+					// muestra la clasificacion de la liga. Se ordenara por puntos. Se sumaran los
+					// puntos de los jugadores de cada equipo y asi se obtendran los puntos de
+					// un equipo.
+					break;
+				case 8:
+					mostrarStaffs(fich1);
+					// muestra el jugador que mas años haya estado en un equipo.
+					break;
+				case 9:
+					traspasoJugador(fich1, fich2);
+					// Se mostrara un listado de tosdos los jugadores para que pueda ver los
+					// codigos. Se pedira el nombr del equipo al que quiera que sea traspasado y se
+					// guardara la info para que se traspase.
+					break;
+				case 10:
+					mostrarJugadoresPos(fich1);
+					// Se le pedira al usuario una de las posiciones. Se comprobara que la posicion
+					// este en el enum. Se mostraran los juadores de dicha posicion
+					break;
+				case 11:
+					jugadoresPorPuntos(fich1);
+					// Se mostrara la lista de jugadores ordenados por los puntos.
+					break;
+				case 12:
+					eliminarEntrenador(fich1);
+					// Pide el nombre del entrenador. Si hay mas de uno con en mismo nombre, le
+					// muestra la info de los dos entrenadores
+					// y le pide el codigo del que desea eliminar.
+					break;
+				case 13:
+					simulacionJornada(fich1, fich2);
+					// enfrenta a todos los equipos (los 16 del filldata) y gana el equipo con mas
+					// puntos. Los puntos los hace cada jugador con un random.
+					// muestra como quedan los partidos.
+					break;
+				case 14:
+					System.out.println("Agurrr");
+					break;
 
 			}
 
@@ -357,7 +362,7 @@ public class Main {
 							System.out.println(
 									"ERROR: El jugador ya pertenece a ese equipo. Introduce un equipo diferente.");
 						} else {
-							//cuenta jugadores en el equipo destino antes de aceptar el traspaso
+							// cuenta jugadores en el equipo destino antes de aceptar el traspaso
 							jugEquiDestino = 0;
 							finArchivo = false;
 							if (fich1.exists()) {
@@ -365,20 +370,25 @@ public class Main {
 									while (!finArchivo) {
 										try {
 											Staff sCount = (Staff) oisCount.readObject();
-											if (sCount instanceof Jugador && sCount.getCod_e().equalsIgnoreCase(nuevoCodigoEquipo)) {
+											if (sCount instanceof Jugador
+													&& sCount.getCod_e().equalsIgnoreCase(nuevoCodigoEquipo)) {
 												jugEquiDestino++;
 											}
-										} catch (EOFException e) { 
+										} catch (EOFException e) {
 											finArchivo = true;
 										}
 									}
 								} catch (Exception e) {
 								}
 							}
-							if (jugEquiDestino >= 15) {
-								System.out.println("ERROR: El equipo de destino ya tiene 15 jugadores. Elija otro.");
-							} else {
+							try {
+								if (jugEquiDestino >= 15) {
+									throw new MaxJugException(
+											"ERROR: El equipo de destino ya tiene 15 jugadores. Elija otro.");
+								}
 								equipoValido = true;
+							} catch (MaxJugException e) {
+								System.out.println(e.getMessage());
 							}
 						}
 					}
@@ -486,10 +496,10 @@ public class Main {
 		System.out.println("\nCLASIFICACIÓN DE LA LIGA");
 		System.out.println("------------------------");
 		for (int i = 0; i < equipos.size(); i++) {
-			System.out.println((i + 1) + ". " + equipos.get(i).getNom_e() + " - Puntos: " + equipos.get(i).getTotalPuntos());
+			System.out.println(
+					(i + 1) + ". " + equipos.get(i).getNom_e() + " - Puntos: " + equipos.get(i).getTotalPuntos());
 		}
 	}
-
 
 	private static void infoEquipo(File fich2) {
 		ArrayList<Equipo> equipos = new ArrayList<>();
@@ -1173,7 +1183,7 @@ public class Main {
 		} else {
 
 			do {
-				continuar = true;//para asegurar que los reintentos funcionen correctamente
+				continuar = true;// para asegurar que los reintentos funcionen correctamente
 				System.out.println("Equipos disponibles:");
 				mostrarEquipos(fich2);
 
@@ -1202,7 +1212,7 @@ public class Main {
 				if (!encontrado) {
 					System.out.println("El equipo no existe. Reintente.");
 				} else {
-					//Reiniciar contadores para cada intento de equipo
+					// Reiniciar contadores para cada intento de equipo
 					jugadoresEnEquipo = 0;
 					finCount = false;
 					if (fich1.exists()) {
@@ -1214,7 +1224,7 @@ public class Main {
 									Staff st = (Staff) oisCount.readObject();
 									if (st instanceof Jugador) {
 										Jugador jug = (Jugador) st;
-										//Contamos cuántos jugadores hay ya en este equipo
+										// Contamos cuántos jugadores hay ya en este equipo
 										if (jug.getCod_e().equalsIgnoreCase(cod_e)) {
 											jugadoresEnEquipo++;
 
@@ -1237,9 +1247,10 @@ public class Main {
 						}
 						// VALIDACIÓN: Si el equipo tiene 15 o más, no permitimos continuar
 						if (jugadoresEnEquipo >= 15) {
-							System.out.println("El equipo " + cod_e + " ya tiene 15 jugadores. No se pueden añadir más.");
+							System.out
+									.println("El equipo " + cod_e + " ya tiene 15 jugadores. No se pueden añadir más.");
 							continuar = false;
-							encontrado = false; //Forzamos a que el bucle pida otro equipo
+							encontrado = false; // Forzamos a que el bucle pida otro equipo
 						}
 					}
 
@@ -1809,7 +1820,9 @@ public class Main {
 					// Calcular puntos aleatorios para el equipo 1 y sumarlos al total del equipo
 					j = 0;
 					while (j < jugadoresEquipo1.size()) {
+						jug = jugadoresEquipo1.get(j);
 						puntosJugador = random.nextInt(101); // 0 a 100
+						jug.setPuntos(jug.getPuntos() + puntosJugador);
 						puntosEquipo1 = puntosEquipo1 + puntosJugador;
 						// Sumar puntos al total histórico del equipo
 						equipo1.setTotalPuntos(equipo1.getTotalPuntos() + puntosJugador);
@@ -1819,7 +1832,9 @@ public class Main {
 					// Calcular puntos aleatorios para el equipo 2 y sumarlos al total del equipo
 					j = 0;
 					while (j < jugadoresEquipo2.size()) {
+						jug = jugadoresEquipo2.get(j);
 						puntosJugador = random.nextInt(101); // 0 a 100
+						jug.setPuntos(jug.getPuntos() + puntosJugador);
 						puntosEquipo2 = puntosEquipo2 + puntosJugador;
 						// Sumar puntos al total histórico del equipo
 						equipo2.setTotalPuntos(equipo2.getTotalPuntos() + puntosJugador);
