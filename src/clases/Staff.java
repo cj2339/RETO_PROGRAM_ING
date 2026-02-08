@@ -97,5 +97,4 @@ public abstract class Staff implements Serializable{
 	}
 
 	public abstract void visualizar();
-	public abstract int calcularAntiguedad();
 }

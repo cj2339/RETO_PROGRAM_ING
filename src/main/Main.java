@@ -1078,7 +1078,7 @@ public class Main {
 		LocalDate fechaIncor;
 		ObjectOutputStream oos;
 		MyObjectOutputStream moos;
-		boolean finArchivo = false; 
+		boolean finArchivo = false;
 		ObjectInputStream ois = null;
 		POSICION posicion = null;
 		boolean correcto = true;
@@ -1103,7 +1103,7 @@ public class Main {
 		System.out.println("Introduce el sueldo: ");
 		sueldo = Utilidades.leerDouble();
 		if (!fich2.exists()) {
-			System.out.println("No hay equipos registrados. No se puede añadir un jugador.");
+			System.out.println("No hay equipos registrados. No se puede añadir un entrenador.");
 		} else {
 
 			do {
