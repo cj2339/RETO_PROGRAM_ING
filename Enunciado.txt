@@ -1,1 +1,35 @@
-Una empresa nos ha contratado para hacer un programa en java sobre una liga de baloncesto, nos han dicho que tenemos que guardar la información de sus staffs y sus equipos, teniendo en cuenta que adicionalmente tenemos que trabajar entorno a sus ejercicios, entrenadores y jugadores támbien, nos han pedido en especifico que hagamos unos metodos concretos: Añadir jugadores, añadir entrenadores, editar edad de un jugador, eliminar jugador, mostrar la información de un equipo, mostrar clasificación y mostrar jugador con más tiempo en el equipo, cada equipo tiene que tener un maximo de 15 jugadores. 
+ENUNCIADO DEL PROYECTO: 
+Se requiere el desarrollo de un programa en Java para la gestión de una liga de baloncesto, permitiendo el registro y administración de equipos, personal (jugadores y entrenadores), y ejercicios de entrenamiento. El sistema ofrece funcionalidades para la manipulación de datos, visualización de estadísticas y una simulación de jornada.
+
+Clases Principales y su Estructura:
+1	Clase Abstracta Staff:
+◦	Atributos: cod_s (código), nom_s (nombre), edad, fechaIncor (fecha de incorporación), pais, sueldo, cod_e (código del equipo).
+◦	Herencia: Clases Jugador y Entrenador heredarán de Staff.
+◦	Métodos Abstractos: visualizar(), calcularAntiguedad().
+2	Clase Jugador:
+◦	Herencia: Hereda de Staff.
+◦	Atributos Específicos: puntos (puntos anotados), posicion (enumeración POSICION).
+◦	Interfaz: Implementa Comparable<Jugador> para ordenar por puntos.
+3	Clase Entrenador:
+◦	Herencia: Hereda de Staff.
+◦	Atributos Específicos: jugadaBase (jugada estratégica principal), Ejercicio (un HashMap<String, Ejercicio> de ejercicios asociados al entrenador).
+4	Clase Equipo:
+◦	Atributos: cod_e (código), nom_e (nombre), fechaFundacion (fecha de fundación), cantico (ruta a un archivo de texto con el cántico), totalPuntos (puntos acumulados en la liga).
+◦	Restricciones: Cada equipo tiene un límite máximo de 15 jugadores (controlado mediante MaxJugException).
+◦	Interfaz: Implementa Comparable<Equipo> para ordenar por totalPuntos.
+5	Clase Ejercicio:
+◦	Atributos: cod_ej (código), nom_ej (nombre), descrip (descripción), dificultad (nivel de 1 a 5), duracion (en minutos).
+6	Enumeración POSICION:
+◦	Valores: BASE, ALERO, PIVOT.
+
+Main:
+El programa ofrece un menú interactivo con las siguientes operaciones:
+
+•	Gestión de Personal: Añadir jugadores, añadir entrenadores, editar la edad de un jugador, eliminar jugadores, eliminar entrenadores, y traspasar jugadores entre equipos.
+•	Gestión de Entrenamientos: Añadir nuevos ejercicios de entrenamiento.
+•	Consultas y Estadísticas: Mostrar la información completa de un equipo, la clasificación general de la liga (ordenada por puntos de equipo), el jugador con más antigüedad en su equipo, jugadores por posición específica, y un listado de jugadores ordenados por puntos.
+•	Simulación: Ejecutar una simulación de jornada (simulacionJornada).
+
+Excepciones:
+•	MaxJugException: Excepción personalizada para controlar el límite de 15 jugadores por equipo.
+•	MaxEntException: Excepción personalizada para controlar el límite de entrenadores por equipo.	
