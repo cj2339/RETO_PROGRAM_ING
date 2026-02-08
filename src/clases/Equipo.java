@@ -89,7 +89,7 @@ public class Equipo implements Serializable, Comparable<Equipo> {
 	                    System.out.println(linea);
 	                }
 	            } catch (IOException e) {
-	                System.out.println("Error al leer el cántico."); 
+	                System.out.println("Error al leer el cántico.");  
 	            }
 	        } else {
 	            System.out.println("Cantico: Fichero no encontrado (" + this.cantico + ")");
