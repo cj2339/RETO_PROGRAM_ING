@@ -1,49 +1,96 @@
 package clases;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.HashMap;
 
-public class Entrenador extends Staff{
+public abstract class Staff implements Serializable{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String jugadaBase;
-	private HashMap <String, Ejercicio> Ejercicio;
+	protected String cod_s;
+	protected String nom_s;
+	protected int edad;
+	protected LocalDate fechaIncor;
+	protected String pais;
+	protected double sueldo;
+	protected String cod_e;
 	
-	public Entrenador(String cod_s, String nom_s, int edad, LocalDate fechaIncor, String pais, double sueldo, String cod_e, 
-			String jugadaBase, HashMap<String, Ejercicio> ejercicio) {
-		super(cod_s, nom_s, edad, fechaIncor, pais, sueldo, cod_e);
-		this.jugadaBase = jugadaBase;
-		this.Ejercicio = ejercicio;
+	public Staff(String cod_s, String nom_s, int edad, LocalDate fechaIncor, String pais, double sueldo, String cod_e) {
+		this.cod_s = cod_s;
+		this.nom_s = nom_s;
+		this.edad = edad;
+		this.fechaIncor = fechaIncor;
+		this.pais = pais;
+		this.sueldo = sueldo;
+		this.cod_e = cod_e;
+	}
+	
+	public Staff() {
+		this.cod_s = "";
+		this.nom_s = "";
+		this.edad = 0;
+		this.fechaIncor = LocalDate.now();
+		this.pais = "";
+		this.sueldo = 0;
+		this.cod_e = "";
+	}
+	
+	public String getCod_e() {
+		return cod_e;
 	}
 
-	public String getJugadaBase() {
-		return jugadaBase;
+	public void setCod_e(String cod_e) {
+		this.cod_e = cod_e;
 	}
 
-	public void setJugadaBase(String jugadaBase) {
-		this.jugadaBase = jugadaBase;
+	public String getCod_s() {
+		return cod_s;
 	}
 
-	public HashMap<String, Ejercicio> getEjercicio() {
-		return Ejercicio;
+	public void setCod_s(String cod_s) {
+		this.cod_s = cod_s;
 	}
 
-	public void setEjercicio(HashMap<String, Ejercicio> ejercicio) {
-		Ejercicio = ejercicio;
+	public String getNom_s() {
+		return nom_s;
 	}
 
-	@Override
-	public void visualizar() {
-		System.out.println("Codigo: " + getCod_s());
-		System.out.println("Nombre: " + getNom_s());
-		System.out.println("Edad: " + getEdad());
-		System.out.println("Fecha de incorporacion: " + getFechaIncor());
-		System.out.println("Pais: " + getPais());
-		System.out.println("Sueldo: " + getSueldo());
-		System.out.println("Codigo del equipo: " + getCod_e());
-		System.out.println("Jugada base: " + getJugadaBase());
-		System.out.println("Ejercicios: " + getEjercicio());		
-	}	
+	public void setNom_s(String nom_s) {
+		this.nom_s = nom_s;
+	}
+
+	public int getEdad() {
+		return edad;
+	}
+
+	public void setEdad(int edad) {
+		this.edad = edad;
+	}
+
+	public LocalDate getFechaIncor() {
+		return fechaIncor;
+	}
+
+	public void setFechaIncor(LocalDate fechaIncor) {
+		this.fechaIncor = fechaIncor;
+	}
+
+	public String getPais() {
+		return pais;
+	}
+
+	public void setPais(String pais) {
+		this.pais = pais;
+	}
+
+	public double getSueldo() {
+		return sueldo;
+	}
+
+	public void setSueldo(double sueldo) {
+		this.sueldo = sueldo;
+	}
+
+	public abstract void visualizar();
 }
