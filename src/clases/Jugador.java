@@ -3,7 +3,6 @@ package clases;
 import java.time.LocalDate;
 
 public class Jugador extends Staff implements Comparable<Jugador> {
-
 	/**
 	 * 
 	 */
@@ -54,16 +53,8 @@ public class Jugador extends Staff implements Comparable<Jugador> {
 		System.out.println("Posicion: " + getPosicion());
 
 	}
-
-	@Override
-	public int calcularAntiguedad() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 	@Override
     public int compareTo(Jugador otro) {
         return Integer.compare(otro.getPuntos(), this.puntos);
     }
-
 }
