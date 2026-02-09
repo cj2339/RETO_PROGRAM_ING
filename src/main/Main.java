@@ -851,8 +851,38 @@ public class Main {
 		if (!fich1.exists()) {
 			System.out.println("No hay personal registrado. No se puede añadir un entrenamiento.");
 		} else {
-			System.out.println("Introduce el codigo del entrenamiento: ");
-			cod_ej = Utilidades.introducirCadena();
+			do {
+				System.out.println("Introduce el codigo del entrenamiento: ");
+				cod_ej = Utilidades.introducirCadena();
+				encontrado = false;
+				finArchivo = false;
+
+				if (fich1.exists()) {
+					try {
+						ois = new ObjectInputStream(new FileInputStream(fich1));
+						while (!finArchivo && !encontrado) {
+							try {
+								st = (Staff) ois.readObject();
+								if (st instanceof Entrenador) {
+									ent = (Entrenador) st;
+									if (ent.getEjercicio().containsKey(cod_ej)) {
+										encontrado = true;
+									}
+								}
+							} catch (EOFException e) {
+								finArchivo = true;
+							}
+						}
+						ois.close();
+					} catch (IOException | ClassNotFoundException e) {
+						System.err.println("Error al verificar código: " + e.getMessage());
+					}
+				}
+
+				if (encontrado) {
+					System.out.println("El código de entrenamiento ya existe. Por favor, introduce otro.");
+				}
+			} while (encontrado);
 			System.out.println("Introduce el nombre del entrenamiento: ");
 			nom = Utilidades.introducirCadena();
 
@@ -999,7 +1029,7 @@ public class Main {
 					}
 				}
 			} catch (IOException | ClassNotFoundException e) {
-				System.err.println("Error durante la edición: "+ e.getMessage());
+				System.err.println("Error durante la edición: " + e.getMessage());
 			} finally {
 				if (oos != null) {
 					try {
