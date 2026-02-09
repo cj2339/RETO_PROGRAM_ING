@@ -936,55 +936,104 @@ public class Main {
 	}
 
 	private static void editarEdad(File fich1) {
-		String codigo = existeJugador(fich1);
-		String mensaje = "Operación cancelada o jugador no encontrado.";
+		File fichTemp = new File("Temp.dat");
+		String codigo = "";
+		int nuevaEdad = 0;
+		boolean encontrado = false;
+		boolean finArchivo = false;
+		ObjectInputStream ois = null;
+		ObjectOutputStream oos = null;
+		Staff st = null;
 
-		if (!codigo.equals("-1")) {
-			// Pedimos la nueva edad
-			System.out.println("Jugador encontrado: " + codigo);
-			System.out.print("Introduce la nueva edad: ");
-			int nuevaEdad = Utilidades.leerInt(16, 45);
+		if (fich1.exists()) {
+			System.out.println("--- LISTADO DE JUGADORES ---");
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich1));
+				while (!finArchivo) {
+					try {
+						st = (Staff) ois.readObject();
+						if (st instanceof Jugador) {
+							st.visualizar();
+							System.out.println("-----------------------------------");
+						}
+					} catch (EOFException e) {
+						finArchivo = true;
+					}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error al leer el fichero: " + e.getMessage());
+			} finally {
+				if (ois != null) {
+					try {
+						ois.close();
+					} catch (IOException e) {
+						System.err.println("Error al cerrar flujo de entrada: " + e.getMessage());
+					}
+				}
+			}
 
-			if (fich1.exists() && fich1.length() > 0) {
-				// Lista temporal para guardar todos los jugadores
-				ArrayList<Staff> jugadores = new ArrayList<>();
-				boolean encontrado = false;
-				try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fich1))) {
-					boolean finArchivo = false;
-					while (!finArchivo) {
-						try {
-							Staff sf = (Staff) ois.readObject();
-							if (sf.getCod_e().equalsIgnoreCase(codigo) && sf instanceof Jugador) {
-								sf.setEdad(nuevaEdad);
+			System.out.println("Introduce el codigo del jugador a editar: ");
+			codigo = Utilidades.introducirCadena();
+
+			finArchivo = false;
+
+			try {
+				ois = new ObjectInputStream(new FileInputStream(fich1));
+				oos = new ObjectOutputStream(new FileOutputStream(fichTemp));
+
+				while (!finArchivo) {
+					try {
+						st = (Staff) ois.readObject();
+						if (st instanceof Jugador) {
+							if (st.getCod_s().equalsIgnoreCase(codigo)) {
 								encontrado = true;
-								mensaje = "Edad actualizada correctamente a " + nuevaEdad + " años.";
+								st.visualizar();
+								System.out.println("Introduce la nueva edad: ");
+								nuevaEdad = Utilidades.leerInt(16, 70);
+								st.setEdad(nuevaEdad);
 							}
-							jugadores.add((Staff) sf);
-						} catch (EOFException e) {
-							finArchivo = true;
 						}
+						oos.writeObject(st);
+					} catch (EOFException e) {
+						finArchivo = true;
 					}
-					if (encontrado) {
-						// Reescribimos el fichero
-						try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fich1))) {
-							for (Staff j : jugadores) {
-								oos.writeObject(j);
-							}
-							mensaje = "Cambios guardados correctamente en el fichero.\n" + mensaje;
-						} catch (IOException e) {
-							mensaje = "Error al guardar los cambios: " + e.getMessage();
-						}
+				}
+			} catch (IOException | ClassNotFoundException e) {
+				System.err.println("Error durante la edición: " + e.getMessage());
+			} finally {
+				if (oos != null) {
+					try {
+						oos.close();
+					} catch (IOException e) {
+						System.err.println("Error al cerrar flujo de salida: " + e.getMessage());
+					}
+				}
+				if (ois != null) {
+					try {
+						ois.close();
+					} catch (IOException e) {
+						System.err.println("Error al cerrar flujo de entrada: " + e.getMessage());
+					}
+				}
+			}
+
+			if (encontrado) {
+				if (fich1.delete()) {
+					if (fichTemp.renameTo(fich1)) {
+						System.out.println("Jugador editado correctamente.");
 					} else {
-						mensaje = "Error inesperado: el jugador ya no se encuentra en el fichero.";
+						System.out.println("Error al renombrar el fichero temporal.");
 					}
-				} catch (IOException | ClassNotFoundException e) {
-					mensaje = "Error al leer el fichero de jugadores: " + e.getMessage();
+				} else {
+					System.out.println("Error al borrar el fichero original.");
 				}
 			} else {
-				mensaje = "No hay jugadores registrados.";
+				fichTemp.delete();
+				System.out.println("No se ha encontrado ningun jugador con ese codigo.");
 			}
+		} else {
+			System.out.println("El fichero no existe.");
 		}
-		System.out.println(mensaje);
 	}
 
 	private static void aniadirEntrenador(File fich1, File fich2) {
@@ -1014,7 +1063,7 @@ public class Main {
 		pais = Utilidades.introducirCadena();
 		System.out.println("Introduce el sueldo: ");
 		sueldo = Utilidades.leerDouble();
-		while(sueldo<1) {
+		while (sueldo < 1) {
 			System.out.println("El sueldo no puede ser menor a 1.");
 			System.out.println("Introduce el sueldo: ");
 			sueldo = Utilidades.leerDouble();
@@ -1183,7 +1232,7 @@ public class Main {
 		pais = Utilidades.introducirCadena();
 		System.out.println("Introduce el sueldo: ");
 		sueldo = Utilidades.leerDouble();
-		while(sueldo<1) {
+		while (sueldo < 1) {
 			System.out.println("El sueldo no puede ser menor a 1.");
 			System.out.println("Introduce el sueldo: ");
 			sueldo = Utilidades.leerDouble();
