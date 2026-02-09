@@ -1419,57 +1419,6 @@ public class Main {
 		}
 	}
 
-	private static String existeJugador(File fich1) {
-		String codJugador;
-		String res = "-1"; // Variable para guardar el resultado final
-		boolean encontrado = false;
-		boolean finArchivo = false;
-		ObjectInputStream ois = null;
-
-		System.out.println("Introduce el código del jugador (ej: JUG - 001):");
-		codJugador = Utilidades.introducirCadena();
-
-		// Sólo entramos a buscar si el código no es vacío o "salir"
-		if (!codJugador.isEmpty() && !codJugador.equalsIgnoreCase("salir")) {
-			if (fich1.exists() && fich1.length() > 0) {
-				try {
-					ois = new ObjectInputStream(new FileInputStream(fich1));
-					while (!finArchivo && !encontrado) {
-						try {
-							Staff sf = (Staff) ois.readObject();
-							if (sf instanceof Jugador) {
-								Jugador j = (Jugador) sf;
-								// Comparamos el código del jugador
-								if (j.getCod_s().equalsIgnoreCase(codJugador)) {
-									encontrado = true;
-									res = codJugador; // Si lo encontramos, actualizamos res
-								}
-							}
-						} catch (EOFException e) {
-							finArchivo = true;
-						}
-					}
-				} catch (Exception e) {
-					System.err.println("Error al leer el fichero: " + e.getMessage());
-				} finally {
-					if (ois != null) {
-						try {
-							ois.close();
-						} catch (IOException e) {
-						}
-					}
-				}
-			} else {
-				System.out.println("No hay jugadores registrados todavía.");
-			}
-		}
-		// Si al final no se encontró, devolvemos -1
-		if (!encontrado && !res.equals("-1")) {
-			System.out.println("El jugador con código " + codJugador + " no existe.");
-		}
-		return res;
-	}
-
 	public static int menu() {
 		int ele;
 		System.out.println("\n1. Añadir Jugador");
