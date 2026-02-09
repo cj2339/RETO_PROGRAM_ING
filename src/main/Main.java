@@ -999,7 +999,7 @@ public class Main {
 					}
 				}
 			} catch (IOException | ClassNotFoundException e) {
-				System.err.println("Error durante la edición: " + e.getMessage());
+				System.err.println("Error durante la edición: "+ e.getMessage());
 			} finally {
 				if (oos != null) {
 					try {
