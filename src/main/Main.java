@@ -1014,6 +1014,11 @@ public class Main {
 		pais = Utilidades.introducirCadena();
 		System.out.println("Introduce el sueldo: ");
 		sueldo = Utilidades.leerDouble();
+		while(sueldo<1) {
+			System.out.println("El sueldo no puede ser menor a 1.");
+			System.out.println("Introduce el sueldo: ");
+			sueldo = Utilidades.leerDouble();
+		}
 
 		if (!fich2.exists()) {
 			System.out.println("No hay equipos registrados. No se puede añadir un entrenador.");
@@ -1178,6 +1183,11 @@ public class Main {
 		pais = Utilidades.introducirCadena();
 		System.out.println("Introduce el sueldo: ");
 		sueldo = Utilidades.leerDouble();
+		while(sueldo<1) {
+			System.out.println("El sueldo no puede ser menor a 1.");
+			System.out.println("Introduce el sueldo: ");
+			sueldo = Utilidades.leerDouble();
+		}
 		if (!fich2.exists()) {
 			System.out.println("No hay equipos registrados. No se puede añadir un entrenador.");
 		} else {
