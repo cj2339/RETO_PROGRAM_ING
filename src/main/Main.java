@@ -1902,7 +1902,7 @@ public class Main {
 					i = i + 2;
 				}
 
-				// 5. Mostrar clasificación final
+				// 5.Mostrar clasificación final
 				Collections.sort(equipos);
 				System.out.println("\n========================================");
 				System.out.println("     CLASIFICACIÓN TRAS LA JORNADA");
