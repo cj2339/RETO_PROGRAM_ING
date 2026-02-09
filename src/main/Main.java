@@ -2166,18 +2166,16 @@ public class Main {
 	}
 
 	public static void mostrarStaffs(File fich1) {
-		ObjectInputStream ois = null;
 		boolean finArchivo = false;
-		try {
-			ois = new ObjectInputStream(new FileInputStream(fich1));
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fich1))){
+			
 			while (!finArchivo) {
 				Staff st = (Staff) ois.readObject();
 				st.visualizar();
 			}
-
-			ois.close();
 		} catch (EOFException e) {
 			finArchivo = true;
+			
 		} catch (IOException | ClassNotFoundException e) {
 			System.err.println("Error al leer equipos: " + e.getMessage());
 		}
