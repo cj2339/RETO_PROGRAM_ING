@@ -29,7 +29,9 @@ public class Main {
 		File fich2 = new File("Equipos.dat");
 		if (!fich2.exists()) {
 			fillData(fich2);
-			saveDataJugadores(fich1);
+		}
+		if(!fich1.exists()) {
+		saveDataJugadores(fich1);
 		}
 		do {
 			opc = menu();
@@ -1189,9 +1191,10 @@ public class Main {
 							cont++;
 						} catch (EOFException e) {
 							finArchivo = true;
+							ois.close();
 						}
 					}
-					ois.close();
+					
 				} catch (Exception e) {
 					System.err.println("Error al contar registros: " + e.getMessage());
 				}
