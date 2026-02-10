@@ -25,19 +25,23 @@ public class Main {
 
 	public static void main(String[] args) {
 		int opc;
+		int contSt;
 		File fich1 = new File("Staffs.dat");
 		File fich2 = new File("Equipos.dat");
 		if (!fich2.exists()) {
 			fillData(fich2);
 		}
-		if(!fich1.exists()) {
-		saveDataJugadores(fich1);
+		if (!fich1.exists()) {
+			saveDataJugadores(fich1);
 		}
+
+		contSt = obtenerUltimoCodigo(fich1);
+
 		do {
 			opc = menu();
 			switch (opc) {
 				case 1:
-					aniadirJugador(fich1, fich2);
+					aniadirJugador(fich1, fich2, contSt);
 					// El codigo se autogenerara (Ejemplo: JUG - 001) los demas datos NO se iran
 					// seteando. Se pediran todos los datos y se guardaran al final.
 					break;
@@ -1194,7 +1198,7 @@ public class Main {
 							ois.close();
 						}
 					}
-					
+
 				} catch (Exception e) {
 					System.err.println("Error al contar registros: " + e.getMessage());
 				}
@@ -1234,7 +1238,7 @@ public class Main {
 		}
 	}
 
-	private static void aniadirJugador(File fich1, File fich2) {
+	private static void aniadirJugador(File fich1, File fich2, int contSt) {
 		String nombre_s, pais, cod_e, tipo, cod_j = "JUG - ", cod_ju;
 		int edad, puntos, cont = 0;
 		double sueldo;
@@ -1373,29 +1377,9 @@ public class Main {
 					}
 				} while (!correcto);
 
-				// Contar total de registros para generar el ID (JUG - X)
-				finArchivo = false;
-				if (fich1.exists()) {
-					try {
-						ois = new ObjectInputStream(new FileInputStream(fich1));
-						while (!finArchivo) {
-							ois.readObject();
-							cont++;
-						}
-					} catch (EOFException e) {
-						finArchivo = true;
-					} catch (Exception e) {
-						System.err.println("Error al contar registros: " + e.getMessage());
-					} finally {
-						try {
-							if (ois != null)
-								ois.close();
-						} catch (IOException e) {
-						}
-					}
-				}
-
-				cod_ju = cod_j + (cont + 1);
+				// Generar el siguiente ID usando el contador estático
+				contSt++;
+				cod_ju = cod_j + contSt;
 				System.out.println("El codigo del jugador es " + cod_ju);
 				Jugador j = new Jugador(cod_ju, nombre_s, edad, fechaIncor, pais, sueldo, cod_e, puntos, posicion);
 
@@ -2167,18 +2151,50 @@ public class Main {
 
 	public static void mostrarStaffs(File fich1) {
 		boolean finArchivo = false;
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fich1))){
-			
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fich1))) {
+
 			while (!finArchivo) {
 				Staff st = (Staff) ois.readObject();
 				st.visualizar();
 			}
 		} catch (EOFException e) {
 			finArchivo = true;
-			
+
 		} catch (IOException | ClassNotFoundException e) {
 			System.err.println("Error al leer equipos: " + e.getMessage());
 		}
+	}
+
+	private static int obtenerUltimoCodigo(File fich1) {
+		int ultimoId = 0;
+		boolean finArchivo = false;
+		Staff s = null;
+		String cod = "";
+		int id = 0;
+
+		if (fich1.exists()) {
+			while (!finArchivo) {
+				try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fich1))) {
+					s = (Staff) ois.readObject();
+					cod = s.getCod_s();
+					try {
+						if (cod.length() > 6) {
+							id = Integer.parseInt(cod.substring(6, cod.length()));
+							if (id > ultimoId) {
+								ultimoId = id;
+							}
+						}
+					} catch (NumberFormatException e) {
+						System.err.println("Error al convertir el código: " + e.getMessage());
+					}
+				} catch (EOFException e) {
+					finArchivo = true;
+				} catch (IOException | ClassNotFoundException e) {
+					System.err.println("Error al leer el fichero para obtener el último código: " + e.getMessage());
+				}
+			}
+		}
+		return ultimoId;
 	}
 
 }
