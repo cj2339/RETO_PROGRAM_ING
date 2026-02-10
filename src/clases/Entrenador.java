@@ -8,12 +8,14 @@ public class Entrenador extends Staff{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private String contraseña;
 	private String jugadaBase;
 	private HashMap <String, Ejercicio> Ejercicio;
 	
 	public Entrenador(String cod_s, String nom_s, int edad, LocalDate fechaIncor, String pais, double sueldo, String cod_e, 
-			String jugadaBase, HashMap<String, Ejercicio> ejercicio) {
+			String contraseña, String jugadaBase, HashMap<String, Ejercicio> ejercicio) {
 		super(cod_s, nom_s, edad, fechaIncor, pais, sueldo, cod_e);
+		this.contraseña = contraseña;
 		this.jugadaBase = jugadaBase;
 		this.Ejercicio = ejercicio;
 	}
@@ -34,6 +36,14 @@ public class Entrenador extends Staff{
 		Ejercicio = ejercicio;
 	}
 
+	public String getContraseña() {
+		return contraseña;
+	}
+
+	public void setContraseña(String contraseña) {
+		this.contraseña = contraseña;
+	}
+
 	@Override
 	public void visualizar() {
 		System.out.println("Codigo: " + getCod_s());
@@ -43,6 +53,7 @@ public class Entrenador extends Staff{
 		System.out.println("Pais: " + getPais());
 		System.out.println("Sueldo: " + getSueldo());
 		System.out.println("Codigo del equipo: " + getCod_e());
+		System.out.println("Contraseña: " + getContraseña());
 		System.out.println("Jugada base: " + getJugadaBase());
 		System.out.println("Ejercicios: " + getEjercicio());		
 	}	

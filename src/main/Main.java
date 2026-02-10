@@ -35,6 +35,8 @@ public class Main {
 			saveDataJugadores(fich1);
 		}
 
+		logIn(fich1);
+
 		contSt = obtenerUltimoCodigo(fich1);
 
 		do {
@@ -1205,7 +1207,7 @@ public class Main {
 			}
 
 			cod = "ENT - " + (cont + 1);
-			Entrenador ent = new Entrenador(cod, nom, edad, fecha, pais, sueldo, cod_e, jug_base, ejercicios);
+			Entrenador ent = new Entrenador(cod, nom, edad, fecha, pais, sueldo, cod_e, "1234", jug_base, ejercicios);
 
 			try {
 				if (!fich1.exists()) {
@@ -2107,38 +2109,38 @@ public class Main {
 
 			// --- ENTRENADORES ---
 			oos.writeObject(new Entrenador("ENT - " + k++, "Natxo Lezcano", 50, LocalDate.of(2022, 6, 1), "España",
-					50000, "MOR - 1", "Defensa Zonal", new HashMap<>()));
+					50000, "MOR - 1", "1234", "Defensa Zonal", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Chus Mateo", 54, LocalDate.of(2022, 7, 1), "España", 80000,
-					"REA - 1", "Ataque Rápido", new HashMap<>()));
+					"REA - 1", "1234", "Ataque Rápido", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Roger Grimau", 45, LocalDate.of(2023, 6, 26), "España",
-					70000, "BAR - 1", "Pick and Roll", new HashMap<>()));
+					70000, "BAR - 1", "1234", "Pick and Roll", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Ibon Navarro", 47, LocalDate.of(2022, 2, 1), "España",
-					55000, "UNI - 1", "Presión Alta", new HashMap<>()));
+					55000, "UNI - 1", "1234", "Presión Alta", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Álex Mumbrú", 44, LocalDate.of(2022, 6, 14), "España",
-					55000, "VAL - 1", "Juego Interior", new HashMap<>()));
+					55000, "VAL - 1", "1234", "Juego Interior", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Txus Vidorreta", 57, LocalDate.of(2018, 6, 1), "España",
-					60000, "LEN - 1", "Tiro Exterior", new HashMap<>()));
+					60000, "LEN - 1", "1234", "Tiro Exterior", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Jaka Lakovic", 45, LocalDate.of(2022, 6, 17), "Eslovenia",
-					58000, "GRA - 1", "Transición", new HashMap<>()));
+					58000, "GRA - 1", "1234", "Transición", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Joan Peñarroya", 54, LocalDate.of(2022, 6, 1), "España",
-					65000, "BAS - 1", "Ritmo Alto", new HashMap<>()));
+					65000, "BAS - 1", "1234", "Ritmo Alto", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Pedro Martínez", 62, LocalDate.of(2019, 6, 24), "España",
-					60000, "BAX - 1", "Juego Dinámico", new HashMap<>()));
+					60000, "BAX - 1", "1234", "Juego Dinámico", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Carles Duran", 47, LocalDate.of(2018, 2, 7), "España",
-					55000, "JOV - 1", "Cantera", new HashMap<>()));
+					55000, "JOV - 1", "1234", "Cantera", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Sito Alonso", 47, LocalDate.of(2019, 1, 28), "España",
-					50000, "UCA - 1", "Defensa Agresiva", new HashMap<>()));
+					50000, "UCA - 1", "1234", "Defensa Agresiva", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Porfirio Fisac", 58, LocalDate.of(2022, 10, 1), "España",
-					55000, "CAS - 1", "Táctica", new HashMap<>()));
+					55000, "CAS - 1", "1234", "Táctica", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Jaume Ponsarnau", 52, LocalDate.of(2022, 6, 20), "España",
-					50000, "SUR - 1", "Orden", new HashMap<>()));
+					50000, "SUR - 1", "1234", "Orden", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Veljko Mrsic", 52, LocalDate.of(2022, 1, 21), "Croacia",
-					48000, "RIO - 1", "Físico", new HashMap<>()));
+					48000, "RIO - 1", "1234", "Físico", new HashMap<>()));
 			oos.writeObject(new Entrenador("ENT - " + k++, "Pablo Pin", 40, LocalDate.of(2012, 8, 1), "España", 45000,
-					"COV - 1", "Continuidad", new HashMap<>()));
+					"COV - 1", "1234", "Continuidad", new HashMap<>()));
 			oos.writeObject(
 					new Entrenador("ENT - " + k++, "Jose Luis Mendilibar", 52, LocalDate.of(2022, 6, 20), "España",
-							50000, "BIL - 1", "Orden", new HashMap<>()));
+							50000, "BIL - 1", "1234", "Orden", new HashMap<>()));
 
 			System.out.println("Escritura directa finalizada: 75 jugadores y 15 entrenadores guardados en Staffs.dat");
 			oos.close();
@@ -2197,4 +2199,63 @@ public class Main {
 		return ultimoId;
 	}
 
+	public static void logIn(File fich) {
+		String nombre = "";
+		String contra = "";
+		boolean acceso = false;
+		boolean finArchivo = false;
+		boolean encontrado = false;
+		ObjectInputStream ois = null;
+		Staff st = null;
+		Entrenador ent = null;
+
+		if (fich.exists()) {
+			do {
+				System.out.println("\n--- INICIO DE SESIÓN ---");
+				System.out.println("Introduce tu nombre de entrenador:");
+				nombre = Utilidades.introducirCadena();
+				System.out.println("Introduce tu contraseña:");
+				contra = Utilidades.introducirCadena();
+
+				finArchivo = false;
+				encontrado = false;
+
+				try {
+					ois = new ObjectInputStream(new FileInputStream(fich));
+					while (!finArchivo && !encontrado) {
+						try {
+							st = (Staff) ois.readObject();
+							if (st instanceof Entrenador) {
+								ent = (Entrenador) st;
+								if (ent.getNom_s().equalsIgnoreCase(nombre) && ent.getContraseña().equals(contra)) {
+									encontrado = true;
+									acceso = true;
+									System.out.println("Login correcto. Bienvenido, " + ent.getNom_s());
+								}
+							}
+						} catch (EOFException e) {
+							finArchivo = true;
+						}
+					}
+				} catch (IOException | ClassNotFoundException e) {
+					System.err.println("Error al leer el fichero de usuarios: " + e.getMessage());
+				} finally {
+					if (ois != null) {
+						try {
+							ois.close();
+						} catch (IOException e) {
+							System.err.println("Error al cerrar flujo: " + e.getMessage());
+						}
+					}
+				}
+
+				if (!encontrado) {
+					System.out.println("Credenciales incorrectas. Inténtalo de nuevo.");
+				}
+
+			} while (!acceso);
+		} else {
+			System.out.println("Fichero de datos no encontrado. No se puede iniciar sesión.");
+		}
+	}
 }
